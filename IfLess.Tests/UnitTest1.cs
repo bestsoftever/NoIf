@@ -7,7 +7,8 @@ public class BasicFlowTests
     {
         var result = TestService.ReverseString("abc");
 
-        result.Should().BeOfType<Valid<string>>();
+        result.IsError.Should().BeFalse();
+        result.Value.Should().Be("cba");
     }
 
     [Fact]
@@ -15,39 +16,51 @@ public class BasicFlowTests
     {
         var result = TestService.ReverseString("  ");
 
-        result.Should().BeOfType<Error>();
+        result.IsError.Should().BeTrue();
+        result.Value.Should().BeNull();
+    }
+
+    [Fact]
+    public void WhenValidInput_ThenProperlyPassedToNextMethod()
+    {
+        var result = TestService.ReverseString("abc")
+            .Then(s => TestService.ToUpperCase(s));
+
+        result.IsError.Should().BeFalse();
+        result.Value.Should().Be("CBA");
     }
 
     [Fact]
     public void WhenError_ThenProperlyPassesIt()
     {
-        var result = TestService.ReverseString("abc")
-            .Then<string>(s => TestService.ToUpperCase(s));
+        var result = TestService.ReverseString("    ")
+            .Then(s => TestService.ToUpperCase(s));
 
-        result.Should().BeOfType<Valid<string>>();
-    }
-}
-
-class TestService
-{
-    public static Result ReverseString(string input)
-    {
-        if (string.IsNullOrWhiteSpace(input))
-        {
-            return new Error("Input value can't be empty");
-        }
-
-        var reversed = new string(input.Reverse().ToArray());
-        return new Valid<string>(reversed);
+        result.IsError.Should().BeTrue();
+        result.Value.Should().BeNull();
     }
 
-    public static Result ToUpperCase(string input)
+    static class TestService
     {
-        if (string.IsNullOrWhiteSpace(input))
+        public static Result<string> ReverseString(string input)
         {
-            return new Error("Input value can't be empty");
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return new Error("Input value can't be empty");
+            }
+
+            var reversed = new string(input.Reverse().ToArray());
+            return reversed;
         }
 
-        return new Valid<string>(input.ToUpperInvariant());
+        public static Result<string> ToUpperCase(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return new Error("Input value can't be empty");
+            }
+
+            return input.ToUpperInvariant();
+        }
     }
 }

@@ -1,44 +1,53 @@
-﻿namespace IfLess;
+﻿/*
+ * Requirements:
+ * parameterless constructor MUST NOT be exposed - nobody can't create a result which have no initial value
+ *      so we can't use struct
+ * errors SHOULD be able to pass through the whole flow, without necessity to re-mapping - it means errors can't be generic?
+ * implicit conversions
+ */
+
 
 /*
- * - sync flow
+ * - sync flow for reference types
+ * - sync flow for value types
  * - unit type
  * - async flow
  * - collection flow
  * - combining errors
  */
 
+
 public static class ResultExtensions
 {
-    public static Result Then<TValue>(this Result result, Func<TValue, Result> func)
+    public static Result<TOutput> Then<TInput, TOutput>(this Result<TInput> result, Func<TInput, Result<TOutput>> func)
     {
-        return result is Valid<TValue> valid ? func(valid.Value) : result;
+        return result.IsError ? result.Error : func(result.Value);
     }
 }
 
-public abstract class Result
+public class Result<TValue>
 {
-    public abstract bool IsError { get; }
-}
+    public Error? Error { get; }
+    public TValue? Value { get; }
+    public bool IsError => Error != null;
 
-public class Valid<TValue> : Result
-{
-    public override bool IsError => false;
+    public Result(Error error)
+    {
+        Error = error;
+    }
 
-    public TValue Value;
-
-    public Valid(TValue data)
+    public Result(TValue data)
     {
         Value = data;
     }
 
-    public static implicit operator Valid<TValue>(TValue data) => new Valid<TValue>(data);
+    public static implicit operator Result<TValue>(Error error) => new(error);
+
+    public static implicit operator Result<TValue>(TValue data) => new(data);
 }
 
-public class Error : Result
+public class Error
 {
-    public override bool IsError => false;
-
     public string Message { get; init; }
 
     public Error(string message)
