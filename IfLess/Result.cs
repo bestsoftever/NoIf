@@ -8,12 +8,10 @@
  */
 
 /*
- * - sync flow for reference types
- * - sync flow for value types
  * - unit type
  * - async flow
  * - collection flow
- * - combining errors
+ * - composite errors
  */
 
 public abstract class Result<T>
@@ -35,7 +33,7 @@ public class Right<T> : Result<T>
     public static implicit operator Right<T>(T data) => new Right<T>(data);
 }
 
-public class Wrong<T> : Result<T>
+internal class Wrong<T> : Result<T>
 {
     public string Message { get; init; }
 
