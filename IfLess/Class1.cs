@@ -16,34 +16,8 @@
  * - combining errors
  */
 
-public abstract class Result<T> //: IWrong3
+public abstract class Result<T>
 {
-    //public abstract T Value { get; }
-
-    //public static implicit operator T(Result3<T> result) => result.Value;
-
-    //public static implicit operator Right3<T>(T data) => new Right3<T>(data);
-
-    //protected Result3(Wrong3 error)
-    //{
-    //    Error = error;
-    //}
-
-    //protected Result3(T data)
-    //{
-    //    Value = data;
-    //}
-
-    //public static Right3<T> Right(T value)
-    //{
-    //    return new Right3<T>(value);
-    //}
-
-    //public static Wrong3 Wrong(string message)
-    //{
-    //    return new Wrong3(message);
-    //}
-
     public static implicit operator Result<T>(Wrong wrong) => Wrong<T>.From(wrong);
 
     public static implicit operator Result<T>(T data) => new Right<T>(data);
@@ -70,12 +44,12 @@ public class Wrong<T> : Result<T>
         Message = message;
     }
 
-    public static Wrong<T> From<TInner>(Wrong<TInner> innerWrong)
+    public static Wrong<T> From(Wrong innerWrong)
     {
         return new Wrong<T>(innerWrong.Message);
     }
 
-    public static Wrong<T> From(Wrong innerWrong)
+    public static Wrong<T> From<TInner>(Wrong<TInner> innerWrong)
     {
         return new Wrong<T>(innerWrong.Message);
     }
@@ -98,8 +72,9 @@ public static class ResultExtensions
         return result switch
         {
             Wrong wrong => wrong,
+            Wrong<TInput> wrong => Wrong<TOutput>.From(wrong),
             Right<TInput> right => func(right.Value),
-            _ => new Wrong<TOutput>("Never happened!"),
+            _ => throw new InvalidOperationException("This should never happened."),
         };
     }
 }

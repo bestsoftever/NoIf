@@ -80,7 +80,7 @@ public class FlowTests
     {
         var result = TestService.ReverseString("  ");
 
-        result.Should().BeOfType<Wrong<string>>();
+        result.Should().BeEquivalentTo(new Wrong("Input value can't be empty"));
     }
 
     [Fact]
@@ -98,7 +98,7 @@ public class FlowTests
         var result = TestService.ReverseString("    ")
             .Then(s => TestService.ToUpperCase(s));
 
-        result.Should().BeOfType<Wrong<string>>();
+        result.Should().BeEquivalentTo(new Wrong("Input value can't be empty"));
     }
 
     static class TestService
