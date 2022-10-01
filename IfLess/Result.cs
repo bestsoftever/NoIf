@@ -10,8 +10,9 @@
 /*
  * - unit type
  * - async flow
- * - collection flow
  * - composite errors
+ * - context (nested Then)
+ * - collection flow (ThenForeach) which will return composite error
  */
 
 public abstract class Result<T>
@@ -65,7 +66,8 @@ public class Wrong
 
 public static class ResultExtensions
 {
-    public static Result<TOutput> Then<TInput, TOutput>(this Result<TInput> result, Func<TInput, Result<TOutput>> func)
+    public static Result<TOutput> Then<TInput, TOutput>(this Result<TInput> result,
+        Func<TInput, Result<TOutput>> func)
     {
         return result switch
         {
@@ -74,5 +76,29 @@ public static class ResultExtensions
             Right<TInput> right => func(right.Value),
             _ => throw new InvalidOperationException("This should never happened."),
         };
+    }
+
+    public static async Task<Result<TOutput>> Then<TInput, TOutput>(this Result<TInput> result,
+        Func<TInput, Task<Result<TOutput>>> func)
+    {
+        return result switch
+        {
+            Wrong wrong => Wrong<TOutput>.From(wrong),
+            Wrong<TInput> wrong => Wrong<TOutput>.From(wrong),
+            Right<TInput> right => await func(right.Value),
+            _ => throw new InvalidOperationException("This should never happened."),
+        };
+    }
+
+    public static async Task<Result<TOutput>> Then<TInput, TOutput>(
+        this Task<Result<TInput>> task, Func<TInput, Result<TOutput>> func)
+    {
+        return (await task).Then(func);
+    }
+
+    public static async Task<Result<TOutput>> Then<TInput, TOutput>(
+        this Task<Result<TInput>> task, Func<TInput, Task<Result<TOutput>>> func)
+    {
+        return await (await task).Then(func);
     }
 }

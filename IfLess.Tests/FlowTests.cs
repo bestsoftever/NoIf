@@ -35,27 +35,83 @@ public class FlowTests
 
         result.Should().BeEquivalentTo(new Wrong("Input value can't be empty"));
     }
+}
 
-    static class TestService
+public class AsyncFlowTests
+{
+    [Fact]
+    public async Task WhenValidInput_ReturnsValidResult()
     {
-        public static Result<string> ReverseString(string input)
-        {
-            if (string.IsNullOrWhiteSpace(input))
-            {
-                return new Wrong("Input value can't be empty");
-            }
+        var result = await TestService.ReverseStringAsync("abc");
 
-            return new string(input.Reverse().ToArray());
-        }
+        result.Should().BeEquivalentTo(new Right<string>("cba"));
+    }
 
-        public static Result<string> ToUpperCase(string input)
-        {
-            if (string.IsNullOrWhiteSpace(input))
-            {
-                return new Wrong("Input value can't be empty");
-            }
+    [Fact]
+    public async Task WhenFailedInput_ReturnsError()
+    {
+        var result = await TestService.ReverseStringAsync("  ");
 
-            return input.ToUpperInvariant();
-        }
+        result.Should().BeEquivalentTo(new Wrong("Input value can't be empty"));
+    }
+
+    [Fact]
+    public async Task WhenValidInput_ThenProperlyPassedToNextMethod()
+    {
+        var result = await TestService.ReverseStringAsync("abc")
+            .Then(s => TestService.ToUpperCaseAsync(s));
+
+        result.Should().BeEquivalentTo(new Right<string>("CBA"));
+    }
+
+    [Fact]
+    public async Task WhenError_ThenProperlyPassesIt()
+    {
+        var result = await TestService.ReverseStringAsync("    ")
+            .Then(s => TestService.ToUpperCaseAsync(s));
+
+        result.Should().BeEquivalentTo(new Wrong("Input value can't be empty"));
+    }
+}
+
+public class FirstSyncThenAsyncFlowTests
+{
+    [Fact]
+    public async Task WhenValidInput_ThenProperlyPassedToNextMethodAsync()
+    {
+        var result = await TestService.ReverseString("abc")
+            .Then(s => TestService.ToUpperCaseAsync(s));
+
+        result.Should().BeEquivalentTo(new Right<string>("CBA"));
+    }
+
+    [Fact]
+    public async Task WhenError_ThenProperlyPassesItAsync()
+    {
+        var result = await TestService.ReverseString("    ")
+            .Then(s => TestService.ToUpperCaseAsync(s));
+
+        result.Should().BeEquivalentTo(new Wrong("Input value can't be empty"));
+    }
+}
+
+public class FirstAsyncThenSyncFlowTests
+{
+    [Fact]
+    public async Task WhenValidInput_ThenProperlyPassedToNextMethodAsync()
+    {
+        var result = await TestService.ReverseStringAsync("abc")
+            .Then(s => TestService.ToUpperCase(s));
+
+        result.Should().BeEquivalentTo(new Right<string>("CBA"));
+    }
+
+    [Fact]
+    public async Task WhenError_ThenProperlyPassesItAsync()
+    {
+        var result = await TestService.ReverseStringAsync("    ")
+            .Then(s => TestService.ToUpperCase(s));
+
+        result.Should().BeEquivalentTo(new Wrong("Input value can't be empty"));
     }
 }
