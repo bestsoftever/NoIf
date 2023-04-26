@@ -9,7 +9,6 @@
 
 /*
  * - unit type
- * - async flow
  * - composite errors
  * - context (nested Then)
  * - collection flow (ThenForeach) which will return composite error
@@ -22,6 +21,15 @@ public abstract class Result<T>
     public static implicit operator Result<T>(T data) => new Right<T>(data);
 }
 
+// for "void" scenarios
+public class Result : Result<ValueTuple>
+{
+    public static Result Empty = new Result();
+
+    public static implicit operator Result(Wrong wrong) => wrong;
+}
+
+// internal?
 public class Right<T> : Result<T>
 {
     public Right(T value)

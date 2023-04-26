@@ -45,4 +45,26 @@ static class TestService
 
         return input.ToUpperInvariant();
     }
+
+    public static Result DoNothing(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input))
+        {
+            return new Wrong("Input value can't be empty");
+        }
+
+        return new Result();
+    }
+
+    public static async Task<Result> DoNothingAsync(string input)
+    {
+        await Task.Yield();
+
+        if (string.IsNullOrWhiteSpace(input))
+        {
+            return new Wrong("Input value can't be empty");
+        }
+
+        return Result.Empty;
+    }
 }
