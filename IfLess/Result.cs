@@ -23,6 +23,8 @@ public abstract class Result<TRight>
 
     //public static implicit operator Result<TRight>(Wrong<TIn> wrong) => new Result<TRight>(wrong.Message);
 
+    public static implicit operator Result<TRight>(Error error) => new Wrong<TRight>(error);
+
     public static implicit operator Result<TRight>(TRight data) => new Right<TRight>(data);
 
     protected Result() { }
@@ -69,7 +71,7 @@ public class Wrong<TRight> : Result<TRight>
         return await Task.FromResult(new Wrong<TOutput>(Error));
     }
 
-    public static implicit operator Wrong<TRight>(Error error) => new(error);
+    //public static implicit operator Wrong<TRight>(Error error) => new(error);
 
     //public static Wrong<T> From(Wrong innerWrong)
     //{

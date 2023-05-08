@@ -6,7 +6,7 @@ static class TestService
     {
         if (string.IsNullOrWhiteSpace(input))
         {
-            return new Wrong("Input value can't be empty");
+            return new Error("Input value can't be empty");
         }
 
         return new string(input.Reverse().ToArray());
@@ -16,7 +16,7 @@ static class TestService
     {
         if (string.IsNullOrWhiteSpace(input))
         {
-            return new Wrong("Input value can't be empty");
+            return new Error("Input value can't be empty");
         }
 
         return input.ToUpperInvariant();
@@ -28,7 +28,7 @@ static class TestService
 
         if (string.IsNullOrWhiteSpace(input))
         {
-            return new Wrong("Input value can't be empty");
+            return new Error("Input value can't be empty");
         }
 
         return new string(input.Reverse().ToArray());
@@ -40,7 +40,7 @@ static class TestService
 
         if (string.IsNullOrWhiteSpace(input))
         {
-            return new Wrong("Input value can't be empty");
+            return new Error("Input value can't be empty");
         }
 
         return input.ToUpperInvariant();
