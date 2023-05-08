@@ -63,14 +63,15 @@ public class Wrong<TRight> : Result<TRight>
 
     public override Result<TOutput> Then<TOutput>(Func<TRight, Result<TOutput>> func)
     {
-        return new Wrong<TOutput>(Error);
+        return Error;
     }
 
     public override async Task<Result<TOutput>> Then<TOutput>(Func<TRight, Task<Result<TOutput>>> func)
     {
-        return await Task.FromResult(new Wrong<TOutput>(Error));
+        return await Task.FromResult(Error);
     }
 
+    public static implicit operator Wrong<TRight>(Error error) => new Wrong<TRight>(error);
     //public static implicit operator Wrong<TRight>(Error error) => new(error);
 
     //public static Wrong<T> From(Wrong innerWrong)
