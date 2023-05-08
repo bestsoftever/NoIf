@@ -16,49 +16,82 @@
 
 namespace IfLess;
 
-public abstract class Result<T>
+public abstract class Result<TRight>
 {
-    public abstract Result<TOutput> Then<TInput, TOutput>(Func<TInput, Result<TOutput>> func);
-    public abstract Task<Result<TOutput>> Then<TInput, TOutput>(Func<TInput, Task<Result<TOutput>>> func);
+    public abstract Result<TOutput> Then<TOutput>(Func<TRight, Result<TOutput>> func);
+    public abstract Task<Result<TOutput>> Then<TOutput>(Func<TRight, Task<Result<TOutput>>> func);
 
-    public class Right<TRight> : Result<TRight>
-    {
-        public Right(T value)
-        {
-            Value = value;
-        }
+    //public static implicit operator Result<TRight>(Wrong<TIn> wrong) => new Result<TRight>(wrong.Message);
 
-        public T Value { get; }
+    public static implicit operator Result<TRight>(TRight data) => new Right<TRight>(data);
 
-        //public static implicit operator Right<TRight>(TRight data) => new Right<TRight>(data);
-    }
-
-    public class Wrong<TWrong> : Result<TWrong>
-    {
-        public string Message { get; init; }
-
-        public Wrong(string message)
-        {
-            Message = message;
-        }
-
-        //public static Wrong<T> From(Wrong innerWrong)
-        //{
-        //    return new Wrong<T>(innerWrong.Message);
-        //}
-
-        //public static Wrong<T> From<TInner>(Wrong<TInner> innerWrong)
-        //{
-        //    return new Wrong<T>(innerWrong.Message);
-        //}
-    }
-
-    //public static implicit operator Result<T>(Wrong wrong) => Wrong<T>(wrong);
-
-    public static implicit operator Result<T>(T data) => new Right<T>(data);
-
-    private Result() { }
+    protected Result() { }
 }
+
+public class Right<TRight> : Result<TRight>
+{
+    public TRight Value { get; }
+
+    public Right(TRight value)
+    {
+        Value = value;
+    }
+
+    public override Result<TOutput> Then<TOutput>(Func<TRight, Result<TOutput>> func)
+    {
+        return func(Value);
+    }
+
+    public override async Task<Result<TOutput>> Then<TOutput>(Func<TRight, Task<Result<TOutput>>> func)
+    {
+        return await func(Value);
+    }
+
+    public static implicit operator Right<TRight>(TRight data) => new(data);
+}
+
+public class Wrong<TRight> : Result<TRight>
+{
+    public Error Error { get; init; }
+
+    public Wrong(Error error)
+    {
+        Error = error;
+    }
+
+    public override Result<TOutput> Then<TOutput>(Func<TRight, Result<TOutput>> func)
+    {
+        return new Wrong<TOutput>(Error);
+    }
+
+    public override async Task<Result<TOutput>> Then<TOutput>(Func<TRight, Task<Result<TOutput>>> func)
+    {
+        return await Task.FromResult(new Wrong<TOutput>(Error));
+    }
+
+    public static implicit operator Wrong<TRight>(Error error) => new(error);
+
+    //public static Wrong<T> From(Wrong innerWrong)
+    //{
+    //    return new Wrong<T>(innerWrong.Message);
+    //}
+
+    //public static Wrong<T> From<TInner>(Wrong<TInner> innerWrong)
+    //{
+    //    return new Wrong<T>(innerWrong.Message);
+    //}
+}
+
+public class Error
+{
+    public string Message { get; }
+
+    public Error(string message)
+    {
+        Message = message;
+    }
+}
+
 
 //// for "void" scenarios
 //public class Result : Result<ValueTuple>
