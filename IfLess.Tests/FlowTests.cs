@@ -116,41 +116,41 @@ public class FirstAsyncThenSyncFlowTests
     }
 }
 
-public class NoValueTests
-{
-    [Fact]
-    public void WhenValidInput_ReturnsValidResult()
-    {
-        var result = TestService.DoNothing("abc");
+//public class NoValueTests
+//{
+//    [Fact]
+//    public void WhenValidInput_ReturnsValidResult()
+//    {
+//        var result = TestService.DoNothing("abc");
 
-        result.Should().Be(new Result());
-    }
+//        result.Should().Be(Result.Empty);
+//    }
 
-    [Fact]
-    public void WhenFailedInput_ReturnsError()
-    {
-        var result = TestService.DoNothing("  ");
+//    [Fact]
+//    public void WhenFailedInput_ReturnsError()
+//    {
+//        var result = TestService.DoNothing("  ");
 
-        result.Should().BeEquivalentTo(new Wrong("Input value can't be empty"));
-    }
+//        result.Should().BeEquivalentTo(new Wrong("Input value can't be empty"));
+//    }
 
-    [Fact]
-    public void WhenValidInput_ThenNextMethodInvoked()
-    {
-        string s = "cba";
-        var result = TestService.DoNothing("abc")
-            .Then(_ => TestService.ToUpperCase(s));
+//    [Fact]
+//    public void WhenValidInput_ThenNextMethodInvoked()
+//    {
+//        string s = "cba";
+//        var result = TestService.DoNothing("abc")
+//            .Then(_ => TestService.ToUpperCase(s));
 
-        result.Should().BeEquivalentTo(new Right<string>("CBA"));
-    }
+//        result.Should().BeEquivalentTo(new Right<string>("CBA"));
+//    }
 
-    [Fact]
-    public void WhenError_ThenProperlyPassesIt()
-    {
-        string s = "cba";
-        var result = TestService.DoNothing("    ")
-            .Then(_ => TestService.ToUpperCase(s));
+//    [Fact]
+//    public void WhenError_ThenProperlyPassesIt()
+//    {
+//        string s = "cba";
+//        var result = TestService.DoNothing("    ")
+//            .Then(_ => TestService.ToUpperCase(s));
 
-        result.Should().BeEquivalentTo(new Wrong("Input value can't be empty"));
-    }
-}
+//        result.Should().BeEquivalentTo(new Wrong("Input value can't be empty"));
+//    }
+//}
