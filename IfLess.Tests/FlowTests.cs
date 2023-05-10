@@ -7,7 +7,7 @@ public class FlowTests
     {
         var result = TestService.ReverseString("abc");
 
-        result.Should().BeEquivalentTo(new Right<string>("cba"));
+        result.Should().Be(new Right<string>("cba"));
     }
 
     [Fact]
@@ -15,7 +15,7 @@ public class FlowTests
     {
         var result = TestService.ReverseString("  ");
 
-        result.Should().BeEquivalentTo(new Error("Input value can't be empty"));
+        result.Should().Be(new Error("Input value can't be empty"));
     }
 
     [Fact]
@@ -24,7 +24,7 @@ public class FlowTests
         var result = TestService.ReverseString("abc")
             .Then(s => TestService.ToUpperCase(s));
 
-        result.Should().BeEquivalentTo(new Right<string>("CBA"));
+        result.Should().Be(new Right<string>("CBA"));
     }
 
     [Fact]
@@ -33,7 +33,7 @@ public class FlowTests
         var result = TestService.ReverseString("    ")
             .Then(s => TestService.ToUpperCase(s));
 
-        result.Should().BeEquivalentTo(new Error("Input value can't be empty"));
+        result.Should().Be(new Error("Input value can't be empty"));
     }
 }
 
@@ -44,7 +44,7 @@ public class AsyncFlowTests
     {
         var result = await TestService.ReverseStringAsync("abc");
 
-        result.Should().BeEquivalentTo(new Right<string>("cba"));
+        result.Should().Be(new Right<string>("cba"));
     }
 
     [Fact]
@@ -52,7 +52,7 @@ public class AsyncFlowTests
     {
         var result = await TestService.ReverseStringAsync("  ");
 
-        result.Should().BeEquivalentTo(new Error("Input value can't be empty"));
+        result.Should().Be(new Error("Input value can't be empty"));
     }
 
     [Fact]
@@ -61,7 +61,7 @@ public class AsyncFlowTests
         var result = await TestService.ReverseStringAsync("abc")
             .Then(s => TestService.ToUpperCaseAsync(s));
 
-        result.Should().BeEquivalentTo(new Right<string>("CBA"));
+        result.Should().Be(new Right<string>("CBA"));
     }
 
     [Fact]
@@ -70,7 +70,7 @@ public class AsyncFlowTests
         var result = await TestService.ReverseStringAsync("    ")
             .Then(s => TestService.ToUpperCaseAsync(s));
 
-        result.Should().BeEquivalentTo(new Error("Input value can't be empty"));
+        result.Should().Be(new Error("Input value can't be empty"));
     }
 }
 
@@ -82,7 +82,7 @@ public class FirstSyncThenAsyncFlowTests
         var result = await TestService.ReverseString("abc")
             .Then(s => TestService.ToUpperCaseAsync(s));
 
-        result.Should().BeEquivalentTo(new Right<string>("CBA"));
+        result.Should().Be(new Right<string>("CBA"));
     }
 
     [Fact]
@@ -91,7 +91,7 @@ public class FirstSyncThenAsyncFlowTests
         var result = await TestService.ReverseString("    ")
             .Then(s => TestService.ToUpperCaseAsync(s));
 
-        result.Should().BeEquivalentTo(new Error("Input value can't be empty"));
+        result.Should().Be(new Error("Input value can't be empty"));
     }
 }
 
@@ -103,7 +103,7 @@ public class FirstAsyncThenSyncFlowTests
         var result = await TestService.ReverseStringAsync("abc")
             .Then(s => TestService.ToUpperCase(s));
 
-        result.Should().BeEquivalentTo(new Right<string>("CBA"));
+        result.Should().Be(new Right<string>("CBA"));
     }
 
     [Fact]
@@ -112,7 +112,7 @@ public class FirstAsyncThenSyncFlowTests
         var result = await TestService.ReverseStringAsync("    ")
             .Then(s => TestService.ToUpperCase(s));
 
-        result.Should().BeEquivalentTo(new Error("Input value can't be empty"));
+        result.Should().Be(new Error("Input value can't be empty"));
     }
 }
 

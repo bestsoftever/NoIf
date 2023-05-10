@@ -30,12 +30,17 @@ public abstract class Result<TRight>
     protected Result() { }
 }
 
-public class Right<TRight> : Result<TRight>
+public sealed class Right<TRight> : Result<TRight>
 {
     public TRight Value { get; }
 
     public Right(TRight value)
     {
+        if (value == null)
+        {
+            throw new Exception("NO.");
+        }
+
         Value = value;
     }
 
@@ -49,10 +54,23 @@ public class Right<TRight> : Result<TRight>
         return await func(Value);
     }
 
-    public static implicit operator Right<TRight>(TRight data) => new(data);
+    public override bool Equals(object? obj)
+    {
+        return obj switch
+        {
+            TRight value => value.Equals(Value),
+            Right<TRight> right => right.Value.Equals(Value),
+            _ => false,
+        };
+    }
 }
 
-public class Wrong<TRight> : Result<TRight>
+internal interface IWrong
+{
+    Error Error { get; }
+}
+
+internal sealed class Wrong<TRight> : Result<TRight>, IWrong
 {
     public Error Error { get; init; }
 
@@ -71,18 +89,15 @@ public class Wrong<TRight> : Result<TRight>
         return await Task.FromResult(Error);
     }
 
-    public static implicit operator Wrong<TRight>(Error error) => new Wrong<TRight>(error);
-    //public static implicit operator Wrong<TRight>(Error error) => new(error);
-
-    //public static Wrong<T> From(Wrong innerWrong)
-    //{
-    //    return new Wrong<T>(innerWrong.Message);
-    //}
-
-    //public static Wrong<T> From<TInner>(Wrong<TInner> innerWrong)
-    //{
-    //    return new Wrong<T>(innerWrong.Message);
-    //}
+    public override bool Equals(object? obj)
+    {
+        return obj switch
+        {
+            Error error => Error.Message == error.Message,
+            Wrong<TRight> wrong => Error.Message == wrong.Error.Message,
+            _ => false,
+        };
+    }
 }
 
 public class Error
@@ -92,6 +107,16 @@ public class Error
     public Error(string message)
     {
         Message = message;
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj switch
+        {
+            Error error => Message == error.Message,
+            IWrong wrong => Message == wrong.Error.Message,
+            _ => false,
+        };
     }
 }
 
