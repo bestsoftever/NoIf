@@ -63,6 +63,11 @@ public sealed class Right<TRight> : Result<TRight>
             _ => false,
         };
     }
+
+    public override int GetHashCode()
+    {
+        return Value.GetHashCode();
+    }
 }
 
 internal interface IWrong
@@ -100,6 +105,7 @@ internal sealed class Wrong<TRight> : Result<TRight>, IWrong
     }
 }
 
+// TODO: add another errors
 public class Error
 {
     public string Message { get; }
