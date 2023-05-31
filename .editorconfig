@@ -1,0 +1,4 @@
+﻿[*.cs]
+
+# RCS1110: Declare type inside namespace.
+dotnet_diagnostic.RCS1110.severity = none
