@@ -30,6 +30,7 @@ public abstract class Result<TRight>
     protected Result() { }
 }
 
+
 public sealed class Right<TRight> : Result<TRight>
 {
     public TRight Value { get; }
@@ -69,6 +70,48 @@ public sealed class Right<TRight> : Result<TRight>
         return Value.GetHashCode();
     }
 }
+
+
+
+//internal interface INone
+//{
+//    None None { get; }
+//}
+
+//internal sealed class None<TRight> : Result<TRight>
+//{
+//    public override Result<TOutput> Then<TOutput>(Func<TRight, Result<TOutput>> func)
+//    {
+//        throw new NotImplementedException();
+//    }
+
+//    public override Task<Result<TOutput>> Then<TOutput>(Func<TRight, Task<Result<TOutput>>> func)
+//    {
+//        throw new NotImplementedException();
+//    }
+//}
+
+public class None //: Result<None>
+{
+    //public override Result<TOutput> Then<TOutput>(Func<None, Result<TOutput>> func)
+    //{
+    //    throw new NotImplementedException();
+    //}
+
+    //public override Task<Result<TOutput>> Then<TOutput>(Func<None, Task<Result<TOutput>>> func)
+    //{
+    //    throw new NotImplementedException();
+    //}
+
+    //public static implicit operator Result<TRight>(Error error) => new Wrong<TRight>(error);
+}
+
+public static class Result
+{
+    public static None None { get; } = new();
+}
+
+
 
 internal interface IWrong
 {
@@ -125,6 +168,8 @@ public class Error
         };
     }
 }
+
+
 
 
 //// for "void" scenarios
