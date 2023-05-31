@@ -30,7 +30,7 @@ public abstract class Result<TRight>
     protected Result() { }
 }
 
-
+// internal can be Right, public should be Some?
 public sealed class Right<TRight> : Result<TRight>
 {
     public TRight Value { get; }
@@ -91,7 +91,7 @@ public sealed class Right<TRight> : Result<TRight>
 //    }
 //}
 
-public class None //: Result<None>
+public class None //: Right<None>
 {
     //public override Result<TOutput> Then<TOutput>(Func<None, Result<TOutput>> func)
     //{
@@ -104,6 +104,9 @@ public class None //: Result<None>
     //}
 
     //public static implicit operator Result<TRight>(Error error) => new Wrong<TRight>(error);
+    //public None() : base(Result.None)
+    //{
+    //}
 }
 
 public static class Result
