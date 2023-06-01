@@ -7,7 +7,7 @@ public class FlowTests
     {
         var result = TestService.ReverseString("abc");
 
-        result.Should().Be(new Right<string>("cba"));
+        result.Should().Be("cba");
     }
 
     [Fact]
@@ -24,7 +24,7 @@ public class FlowTests
         var result = TestService.ReverseString("abc")
             .Then(s => TestService.ToUpperCase(s));
 
-        result.Should().Be(new Right<string>("CBA"));
+        result.Should().Be("CBA");
     }
 
     [Fact]
@@ -44,7 +44,7 @@ public class AsyncFlowTests
     {
         var result = await TestService.ReverseStringAsync("abc");
 
-        result.Should().Be(new Right<string>("cba"));
+        result.Should().Be("cba");
     }
 
     [Fact]
@@ -61,7 +61,7 @@ public class AsyncFlowTests
         var result = await TestService.ReverseStringAsync("abc")
             .Then(s => TestService.ToUpperCaseAsync(s));
 
-        result.Should().Be(new Right<string>("CBA"));
+        result.Should().Be("CBA");
     }
 
     [Fact]
@@ -82,7 +82,7 @@ public class FirstSyncThenAsyncFlowTests
         var result = await TestService.ReverseString("abc")
             .Then(s => TestService.ToUpperCaseAsync(s));
 
-        result.Should().Be(new Right<string>("CBA"));
+        result.Should().Be("CBA");
     }
 
     [Fact]
@@ -103,7 +103,7 @@ public class FirstAsyncThenSyncFlowTests
         var result = await TestService.ReverseStringAsync("abc")
             .Then(s => TestService.ToUpperCase(s));
 
-        result.Should().Be(new Right<string>("CBA"));
+        result.Should().Be("CBA");
     }
 
     [Fact]
@@ -141,7 +141,7 @@ public class NoValueTests
         var result = TestService.DoNothing("abc")
             .Then(_ => TestService.ToUpperCase(s));
 
-        result.Should().Be(new Right<string>("CBA"));
+        result.Should().Be("CBA");
     }
 
     [Fact]

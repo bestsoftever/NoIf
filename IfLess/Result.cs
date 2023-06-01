@@ -16,7 +16,7 @@ public sealed class Right<TRight> : Result<TRight>
 {
     public TRight Value { get; }
 
-    public Right(TRight value)
+    internal Right(TRight value)
     {
         if (value == null)
         {
