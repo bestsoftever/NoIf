@@ -1,4 +1,6 @@
-﻿namespace IfLess;
+﻿using System.Runtime.CompilerServices;
+
+namespace IfLess;
 
 public abstract class Result<TRight>
 {
@@ -48,7 +50,7 @@ public sealed class Right<TRight> : Result<TRight>
 
     public override int GetHashCode()
     {
-        return Value.GetHashCode();
+        return RuntimeHelpers.GetHashCode(this);
     }
 }
 
@@ -97,6 +99,11 @@ internal sealed class Wrong<TRight> : Result<TRight>, IWrong
             _ => false,
         };
     }
+
+    public override int GetHashCode()
+    {
+        return RuntimeHelpers.GetHashCode(this);
+    }
 }
 
 public class Error
@@ -116,6 +123,11 @@ public class Error
             IWrong wrong => Message == wrong.Error.Message,
             _ => false,
         };
+    }
+
+    public override int GetHashCode()
+    {
+        return RuntimeHelpers.GetHashCode(this);
     }
 }
 
