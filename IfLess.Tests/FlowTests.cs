@@ -19,7 +19,7 @@ public class FlowTests
     }
 
     [Fact]
-    public void WhenValidInput_ThenProperlyPassedToNextMethod()
+    public void Then_WhenValidInput_ProperlyPassedToNextMethod()
     {
         var result = TestService.ReverseString("abc")
             .Then(s => TestService.ToUpperCase(s));
@@ -28,11 +28,35 @@ public class FlowTests
     }
 
     [Fact]
-    public void WhenError_ThenProperlyPassesIt()
+    public void Then_WhenError_ProperlyPassesIt()
     {
         var result = TestService.ReverseString("    ")
             .Then(s => TestService.ToUpperCase(s));
 
+        result.Should().Be(new Error("Input value can't be empty"));
+    }
+
+
+    [Fact]
+    public void ThenWithErrorSupport_WhenValidInput_ProperlyPassedToNextMethod()
+    {
+        string errorMessage = string.Empty;
+        var result = TestService.ReverseString("abc")
+            .Then(e => errorMessage = e.Message,
+                  s => TestService.ToUpperCase(s));
+
+        result.Should().Be("CBA");
+    }
+
+    [Fact]
+    public void ThenWithErrorSupport_WhenError_ThenItCanBeHandledAlso()
+    {
+        string errorMessage = string.Empty;
+        var result = TestService.ReverseString("    ")
+            .Then(e => errorMessage = $"message logged: {e.Message}",
+                  s => TestService.ToUpperCase(s));
+
+        errorMessage.Should().Be("message logged: Input value can't be empty");
         result.Should().Be(new Error("Input value can't be empty"));
     }
 }

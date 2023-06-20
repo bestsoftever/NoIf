@@ -144,4 +144,24 @@ public static class ResultExtensions
     {
         return await (await task).Then(func);
     }
+
+    public static Result<TOutput> Then<TRight, TOutput>(this Result<TRight> result,
+        Action<Error> errorHandler,
+        Func<TRight, Result<TOutput>> rightHandler)
+    {
+        Error HandleError(Error error)
+        {
+            errorHandler(error);
+            return error;
+        }
+
+        var finalResult = result switch
+        {
+            Wrong<TRight> wrong => HandleError(wrong.Error),
+            Right<TRight> right => rightHandler(right.Value),
+            _ => throw new InvalidOperationException("It can not happen!"),
+        };
+
+        return finalResult;
+    }
 }
