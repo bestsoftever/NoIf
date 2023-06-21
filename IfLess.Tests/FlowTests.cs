@@ -38,23 +38,23 @@ public class FlowTests
 
 
     [Fact]
-    public void ThenWithErrorSupport_WhenValidInput_ProperlyPassedToNextMethod()
+    public void WhenError_WhenValidInput_ProperlyPassedToNextMethod()
     {
         string errorMessage = string.Empty;
         var result = TestService.ReverseString("abc")
-            .Then(e => errorMessage = e.Message,
-                  s => TestService.ToUpperCase(s));
+            .WhenError(e => errorMessage = e.Message)
+            .Then(s => TestService.ToUpperCase(s));
 
         result.Should().Be("CBA");
     }
 
     [Fact]
-    public void ThenWithErrorSupport_WhenError_ThenItCanBeHandledAlso()
+    public void WhenError_WhenError_ThenItCanBeHandledAlso()
     {
         string errorMessage = string.Empty;
         var result = TestService.ReverseString("    ")
-            .Then(e => errorMessage = $"message logged: {e.Message}",
-                  s => TestService.ToUpperCase(s));
+            .WhenError(e => errorMessage = $"message logged: {e.Message}")
+            .Then(s => TestService.ToUpperCase(s));
 
         errorMessage.Should().Be("message logged: Input value can't be empty");
         result.Should().Be(new Error("Input value can't be empty"));
