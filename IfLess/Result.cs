@@ -189,8 +189,8 @@ public static class ResultExtensions
         };
     }
 
-    public static Result<TRight> WhenError<TRight>(
-        this Task<Result<TRight>> result, Action<Error> errorHandler)
+    public static async Task<Result<TRight>> WhenError<TRight>(
+        this Task<Result<TRight>> task, Action<Error> errorHandler)
     {
         Error HandleError(Error error)
         {
@@ -198,6 +198,7 @@ public static class ResultExtensions
             return error;
         }
 
+        var result = await task;
         return result switch
         {
             Right<TRight> right => right,

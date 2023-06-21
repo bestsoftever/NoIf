@@ -96,6 +96,29 @@ public class AsyncFlowTests
 
         result.Should().Be(new Error("Input value can't be empty"));
     }
+
+    [Fact]
+    public async Task WhenError_WhenValidInput_ProperlyPassedToNextMethodAsync()
+    {
+        string errorMessage = string.Empty;
+        var result = await TestService.ReverseStringAsync("abc")
+            .WhenError(e => errorMessage = e.Message)
+            .Then(s => TestService.ToUpperCaseAsync(s));
+
+        result.Should().Be("CBA");
+    }
+
+    [Fact]
+    public async Task WhenError_WhenError_ThenItCanBeHandledAlso()
+    {
+        string errorMessage = string.Empty;
+        var result = await TestService.ReverseStringAsync("    ")
+            .WhenError(e => errorMessage = $"message logged: {e.Message}")
+            .Then(s => TestService.ToUpperCaseAsync(s));
+
+        errorMessage.Should().Be("message logged: Input value can't be empty");
+        result.Should().Be(new Error("Input value can't be empty"));
+    }
 }
 
 public class FirstSyncThenAsyncFlowTests
