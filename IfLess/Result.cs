@@ -8,19 +8,6 @@ public abstract class Result<TRight>
 
     public abstract Task<Result<TOutput>> Then<TOutput>(Func<TRight, Task<Result<TOutput>>> func);
 
-    /*
-     * method R IfLeft (Func<R> Left)
-     * method R IfLeft (Func<L, R> leftMap)
-     * method R IfLeft (R rightValue)
-     * method Unit IfLeft (Action<L> Left)
-     * method Unit IfRight (Action<R> Right)
-     * method L IfRight (L leftValue)
-     * method L IfRight (Func<L> Right)
-     * method L IfRight (Func<R, L> rightMap)
-     */
-
-    //public abstract Result<TRight> WhenError(Action<Error> errorHandler);
-
     public static implicit operator Result<TRight>(Error error) => new Wrong<TRight>(error);
 
     public static implicit operator Result<TRight>(TRight data) => new Right<TRight>(data);
@@ -172,7 +159,7 @@ public static class ResultExtensions
         return await (await task).Then(func);
     }
 
-    public static Result<TRight> WhenError<TRight>(
+    public static Result<TRight> IfError<TRight>(
         this Result<TRight> result, Action<Error> errorHandler)
     {
         Error HandleError(Error error)
@@ -189,7 +176,7 @@ public static class ResultExtensions
         };
     }
 
-    public static async Task<Result<TRight>> WhenError<TRight>(
+    public static async Task<Result<TRight>> IfError<TRight>(
         this Task<Result<TRight>> task, Action<Error> errorHandler)
     {
         Error HandleError(Error error)
@@ -206,24 +193,4 @@ public static class ResultExtensions
             _ => throw new InvalidOperationException("It can not happen!"),
         };
     }
-
-    //public static Result<TOutput> Then<TRight, TOutput>(this Result<TRight> result,
-    //    Action<Error> errorHandler,
-    //    Func<TRight, Result<TOutput>> rightHandler)
-    //{
-    //    Error HandleError(Error error)
-    //    {
-    //        errorHandler(error);
-    //        return error;
-    //    }
-
-    //    var finalResult = result switch
-    //    {
-    //        Wrong<TRight> wrong => HandleError(wrong.Error),
-    //        Right<TRight> right => rightHandler(right.Value),
-    //        _ => throw new InvalidOperationException("It can not happen!"),
-    //    };
-
-    //    return finalResult;
-    //}
 }

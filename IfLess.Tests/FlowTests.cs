@@ -38,22 +38,22 @@ public class FlowTests
 
 
     [Fact]
-    public void WhenError_WhenValidInput_ProperlyPassedToNextMethod()
+    public void IfError_WhenValidInput_ProperlyPassedToNextMethod()
     {
         string errorMessage = string.Empty;
         Result<string> result = TestService.ReverseString("abc")
-            .WhenError(e => errorMessage = e.Message)
+            .IfError(e => errorMessage = e.Message)
             .Then(s => TestService.ToUpperCase(s));
 
         result.Should().Be("CBA");
     }
 
     [Fact]
-    public void WhenError_WhenError_ThenItCanBeHandledAlso()
+    public void IfError_WhenError_ThenItCanBeHandledAlso()
     {
         string errorMessage = string.Empty;
         Result<string> result = TestService.ReverseString("    ")
-            .WhenError(e => errorMessage = $"message logged: {e.Message}")
+            .IfError(e => errorMessage = $"message logged: {e.Message}")
             .Then(s => TestService.ToUpperCase(s));
 
         errorMessage.Should().Be("message logged: Input value can't be empty");
@@ -89,7 +89,7 @@ public class AsyncFlowTests
     }
 
     [Fact]
-    public async Task WhenError_ThenProperlyPassesIt()
+    public async Task IfError_ThenProperlyPassesIt()
     {
         Result<string> result = await TestService.ReverseStringAsync("    ")
             .Then(s => TestService.ToUpperCaseAsync(s));
@@ -98,22 +98,22 @@ public class AsyncFlowTests
     }
 
     [Fact]
-    public async Task WhenError_WhenValidInput_ProperlyPassedToNextMethodAsync()
+    public async Task IfError_WhenValidInput_ProperlyPassedToNextMethodAsync()
     {
         string errorMessage = string.Empty;
         Result<string> result = await TestService.ReverseStringAsync("abc")
-            .WhenError(e => errorMessage = e.Message)
+            .IfError(e => errorMessage = e.Message)
             .Then(s => TestService.ToUpperCaseAsync(s));
 
         result.Should().Be("CBA");
     }
 
     [Fact]
-    public async Task WhenError_WhenError_ThenItCanBeHandledAlso()
+    public async Task IfError_WhenError_ThenItCanBeHandledAlso()
     {
         string errorMessage = string.Empty;
         Result<string> result = await TestService.ReverseStringAsync("    ")
-            .WhenError(e => errorMessage = $"message logged: {e.Message}")
+            .IfError(e => errorMessage = $"message logged: {e.Message}")
             .Then(s => TestService.ToUpperCaseAsync(s));
 
         errorMessage.Should().Be("message logged: Input value can't be empty");
@@ -133,7 +133,7 @@ public class FirstSyncThenAsyncFlowTests
     }
 
     [Fact]
-    public async Task WhenError_ThenProperlyPassesItAsync()
+    public async Task IfError_ThenProperlyPassesItAsync()
     {
         Result<string> result = await TestService.ReverseString("    ")
             .Then(s => TestService.ToUpperCaseAsync(s));
@@ -142,22 +142,22 @@ public class FirstSyncThenAsyncFlowTests
     }
 
     [Fact]
-    public async Task WhenError_WhenValidInput_ProperlyPassedToNextMethodAsync()
+    public async Task IfError_WhenValidInput_ProperlyPassedToNextMethodAsync()
     {
         string errorMessage = string.Empty;
         Result<string> result = await TestService.ReverseString("abc")
-            .WhenError(e => errorMessage = e.Message)
+            .IfError(e => errorMessage = e.Message)
             .Then(s => TestService.ToUpperCaseAsync(s));
 
         result.Should().Be("CBA");
     }
 
     [Fact]
-    public async Task WhenError_WhenError_ThenItCanBeHandledAlso()
+    public async Task IfError_WhenError_ThenItCanBeHandledAlso()
     {
         string errorMessage = string.Empty;
         Result<string> result = await TestService.ReverseString("    ")
-            .WhenError(e => errorMessage = $"message logged: {e.Message}")
+            .IfError(e => errorMessage = $"message logged: {e.Message}")
             .Then(s => TestService.ToUpperCaseAsync(s));
 
         errorMessage.Should().Be("message logged: Input value can't be empty");
@@ -177,7 +177,7 @@ public class FirstAsyncThenSyncFlowTests
     }
 
     [Fact]
-    public async Task WhenError_ThenProperlyPassesItAsync()
+    public async Task IfError_ThenProperlyPassesItAsync()
     {
         Result<string> result = await TestService.ReverseStringAsync("    ")
             .Then(s => TestService.ToUpperCase(s));
@@ -186,22 +186,22 @@ public class FirstAsyncThenSyncFlowTests
     }
 
     [Fact]
-    public async Task WhenError_WhenValidInput_ProperlyPassedToNextMethodAsync()
+    public async Task IfError_WhenValidInput_ProperlyPassedToNextMethodAsync()
     {
         string errorMessage = string.Empty;
         Result<string> result = await TestService.ReverseStringAsync("abc")
-            .WhenError(e => errorMessage = e.Message)
+            .IfError(e => errorMessage = e.Message)
             .Then(s => TestService.ToUpperCase(s));
 
         result.Should().Be("CBA");
     }
 
     [Fact]
-    public async Task WhenError_WhenError_ThenItCanBeHandledAlso()
+    public async Task IfError_WhenError_ThenItCanBeHandledAlso()
     {
         string errorMessage = string.Empty;
         Result<string> result = await TestService.ReverseStringAsync("    ")
-            .WhenError(e => errorMessage = $"message logged: {e.Message}")
+            .IfError(e => errorMessage = $"message logged: {e.Message}")
             .Then(s => TestService.ToUpperCase(s));
 
         errorMessage.Should().Be("message logged: Input value can't be empty");
@@ -238,7 +238,7 @@ public class NoValueTests
     }
 
     [Fact]
-    public void WhenError_ThenProperlyPassesIt()
+    public void IfError_ThenProperlyPassesIt()
     {
         string s = "cba";
         Result<string> result = TestService.DoNothing("    ")
@@ -258,7 +258,7 @@ public class NoValueTests
     }
 
     [Fact]
-    public async Task WhenError_ThenAsync_ErrorProperlyPassedAsync()
+    public async Task IfError_ThenAsync_ErrorProperlyPassedAsync()
     {
         string s = "cba";
         Result<string> result = await TestService.DoNothing("    ")
@@ -268,24 +268,24 @@ public class NoValueTests
     }
 
     [Fact]
-    public async Task WhenError_WhenValidInput_ProperlyPassedToNextAsyncMethodAsync()
+    public async Task IfError_WhenValidInput_ProperlyPassedToNextAsyncMethodAsync()
     {
         string errorMessage = string.Empty;
         string s = "cba";
         Result<string> result = await TestService.DoNothing("abc")
-            .WhenError(e => errorMessage = e.Message)
+            .IfError(e => errorMessage = e.Message)
             .Then(_ => TestService.ToUpperCaseAsync(s));
 
         result.Should().Be("CBA");
     }
 
     [Fact]
-    public async Task WhenError_WhenError_ThenItCanBeHandledAlsoAsync()
+    public async Task IfError_WhenError_ThenItCanBeHandledAlsoAsync()
     {
         string errorMessage = string.Empty;
         string s = "cba";
         Result<string> result = await TestService.DoNothing("    ")
-            .WhenError(e => errorMessage = $"message logged: {e.Message}")
+            .IfError(e => errorMessage = $"message logged: {e.Message}")
             .Then(_ => TestService.ToUpperCaseAsync(s));
 
         errorMessage.Should().Be("message logged: Input value can't be empty");
