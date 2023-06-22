@@ -5,6 +5,7 @@ namespace IfLess;
 public abstract class Result<TRight>
 {
     public abstract Result<TOutput> Then<TOutput>(Func<TRight, Result<TOutput>> func);
+
     public abstract Task<Result<TOutput>> Then<TOutput>(Func<TRight, Task<Result<TOutput>>> func);
 
     public static implicit operator Result<TRight>(Error error) => new Wrong<TRight>(error);
@@ -38,6 +39,7 @@ public sealed class Right<TRight> : Result<TRight>
         return await func(Value);
     }
 
+
     public override bool Equals(object? obj)
     {
         return obj switch
@@ -52,6 +54,11 @@ public sealed class Right<TRight> : Result<TRight>
     {
         return RuntimeHelpers.GetHashCode(this);
     }
+
+    //public override Result<TRight> WhenError(Action<Error> errorHandler)
+    //{
+    //    return this;
+    //}
 }
 
 public sealed class None
@@ -90,10 +97,12 @@ internal sealed class Wrong<TRight> : Result<TRight>, IWrong
         return await Task.FromResult(Error);
     }
 
+
     public override bool Equals(object? obj)
     {
         return obj switch
         {
+            // TODO: proper equality here!
             Error error => Error.Message == error.Message,
             Wrong<TRight> wrong => Error.Message == wrong.Error.Message,
             _ => false,
@@ -104,6 +113,11 @@ internal sealed class Wrong<TRight> : Result<TRight>, IWrong
     {
         return RuntimeHelpers.GetHashCode(this);
     }
+
+    //public override Result<TRight> WhenError(Action<Error> errorHandler)
+    //{
+    //    throw new NotImplementedException();
+    //}
 }
 
 public class Error
@@ -143,5 +157,40 @@ public static class ResultExtensions
         this Task<Result<TInput>> task, Func<TInput, Task<Result<TOutput>>> func)
     {
         return await (await task).Then(func);
+    }
+
+    public static Result<TRight> IfError<TRight>(
+        this Result<TRight> result, Action<Error> errorHandler)
+    {
+        Error HandleError(Error error)
+        {
+            errorHandler(error);
+            return error;
+        }
+
+        return result switch
+        {
+            Right<TRight> right => right,
+            Wrong<TRight> wrong => HandleError(wrong.Error),
+            _ => throw new InvalidOperationException("It can not happen!"),
+        };
+    }
+
+    public static async Task<Result<TRight>> IfError<TRight>(
+        this Task<Result<TRight>> task, Action<Error> errorHandler)
+    {
+        Error HandleError(Error error)
+        {
+            errorHandler(error);
+            return error;
+        }
+
+        var result = await task;
+        return result switch
+        {
+            Right<TRight> right => right,
+            Wrong<TRight> wrong => HandleError(wrong.Error),
+            _ => throw new InvalidOperationException("It can not happen!"),
+        };
     }
 }
