@@ -39,13 +39,12 @@ public sealed class Right<TRight> : Result<TRight>
         return await func(Value);
     }
 
-
     public override bool Equals(object? obj)
     {
         return obj switch
         {
             TRight value => value.Equals(Value),
-            Right<TRight> right => right.Value.Equals(Value),
+            Right<TRight> right => right.Value!.Equals(Value),
             _ => false,
         };
     }
@@ -96,7 +95,6 @@ internal sealed class Wrong<TRight> : Result<TRight>, IWrong
     {
         return await Task.FromResult(Error);
     }
-
 
     public override bool Equals(object? obj)
     {
