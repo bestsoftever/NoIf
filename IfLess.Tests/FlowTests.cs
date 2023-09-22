@@ -1,33 +1,27 @@
 namespace IfLess.Tests;
 
 /*
-Valid:
+Valid and Invalid for:
 
 sync - sync
 sync - async
 sync - none
+sync - noneasync
 
 async - sync
 async - async
 async - none
+async - noneasync
 
 none - sync
 none - async
 none - none
+none - noneasync
 
-Invalid:
-
-sync - sync
-sync - async
-sync - none
-
-async - sync
-async - async
-async - none
-
-none - sync
-none - async
-none - none
+noneasync - sync
+noneasync - async
+noneasync - none
+noneasync - noneasync
 */
 
 public class SyncTests
@@ -87,7 +81,6 @@ public class SyncTests
     }
 }
 
-
 public class AsyncTests
 {
     [Fact]
@@ -108,7 +101,7 @@ public class AsyncTests
         result.Should().Be("CBA");
     }
 
-     [Fact]
+    [Fact]
     public async void ValidInput_PassedFromAsyncToNone_ReturnsValue()
     {
         Result<None> result = await TestService.ReverseStringAsync("abc")
@@ -117,7 +110,7 @@ public class AsyncTests
         result.Should().Be(Result.None);
     }
 
-     [Fact]
+    [Fact]
     public async void InvalidInput_PassedFromAsyncToSync_ReturnsError()
     {
         Result<string> result = await TestService.ReverseStringAsync("")
@@ -135,7 +128,7 @@ public class AsyncTests
         result.Should().Be(new Error("Input value can't be empty"));
     }
 
-     [Fact]
+    [Fact]
     public async void InvalidInput_PassedFromAsyncToNone_ReturnsError()
     {
         Result<None> result = await TestService.ReverseStringAsync("")
@@ -148,9 +141,57 @@ public class AsyncTests
 public class NoneTests
 {
     [Fact]
-    public void ValidInput_FromSyncToSync_Returns()
+    public void ValidInput_PassedFromNoneToSync_ReturnsValue()
     {
+        Result<string> result = TestService.DoNothing("abc")
+            .Then(s => TestService.ToUpperCase(s));
 
+        result.Should().Be("CBA");
+    }
+
+    [Fact]
+    public async void ValidInput_PassedFromNoneToAsync_ReturnsValue()
+    {
+        Result<string> result = await TestService.ReverseStringAsync("abc")
+            .Then(s => TestService.ToUpperCaseAsync(s));
+
+        result.Should().Be("CBA");
+    }
+
+     [Fact]
+    public async void ValidInput_PassedFromNoneToNone_ReturnsValue()
+    {
+        Result<None> result = await TestService.ReverseStringAsync("abc")
+            .Then(s => TestService.DoNothing(s));
+
+        result.Should().Be(Result.None);
+    }
+
+     [Fact]
+    public async void InvalidInput_PassedFromNoneToSync_ReturnsError()
+    {
+        Result<string> result = await TestService.ReverseStringAsync("")
+            .Then(s => TestService.ToUpperCase(s));
+
+        result.Should().Be(new Error("Input value can't be empty"));
+    }
+
+    [Fact]
+    public async void InvalidInput_PassedFromNoneToAsync_ReturnsError()
+    {
+        Result<string> result = await TestService.ReverseStringAsync("")
+            .Then(s => TestService.ToUpperCaseAsync(s));
+
+        result.Should().Be(new Error("Input value can't be empty"));
+    }
+
+     [Fact]
+    public async void InvalidInput_PassedFromNoneToNone_ReturnsError()
+    {
+        Result<None> result = await TestService.ReverseStringAsync("")
+            .Then(s => TestService.DoNothing(s));
+
+        result.Should().Be(new Error("Input value can't be empty"));
     }
 }
 
