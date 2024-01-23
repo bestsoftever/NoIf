@@ -1,525 +1,164 @@
 namespace IfLess.Tests;
 
-/*
-Valid and Invalid for:
-
-sync - sync
-sync - async
-sync - none
-sync - noneasync
-
-async - sync
-async - async
-async - none
-async - noneasync
-
-none - sync
-none - async
-none - none
-none - noneasync
-
-noneasync - sync
-noneasync - async
-noneasync - none
-noneasync - noneasync
-*/
-
-public class SyncTests
+public class ThenTests
 {
-    [Fact]
-    public void ValidInput_PassedFromSyncToSync_ReturnsValue()
+    public static IEnumerable<object[]> ReturnsUpperCase()
     {
-        Result<string> result = TestService.ReverseString("abc")
+        yield return new object[] { "abc", "ABC" };
+        yield return new object[] { "", new Error("Input value can't be empty") };
+    }
+    public static IEnumerable<object[]> ReturnsUpperCaseAndReverse()
+    {
+        yield return new object[] { "abc", "CBA" };
+        yield return new object[] { "", new Error("Input value can't be empty") };
+    }
+    public static IEnumerable<object[]> ReturnsNone()
+    {
+        yield return new object[] { "abc", Result.None };
+        yield return new object[] { "", new Error("Input value can't be empty") };
+    }
+
+    [Theory, MemberData(nameof(ReturnsUpperCaseAndReverse))]
+    public void SyncToSync(string input, Result<string> expected)
+    {
+        Result<string> result = TestService.ReverseString(input)
             .Then(s => TestService.ToUpperCase(s));
 
-        result.Should().Be("CBA");
+        result.Should().Be(expected);
     }
 
-    [Fact]
-    public async Task ValidInput_PassedFromSyncToAsync_ReturnsValue()
+    [Theory, MemberData(nameof(ReturnsUpperCaseAndReverse))]
+    public async Task SyncToAsync(string input, Result<string> expected)
     {
-        Result<string> result = await TestService.ReverseString("abc")
+        Result<string> result = await TestService.ReverseString(input)
             .Then(s => TestService.ToUpperCaseAsync(s));
 
-        result.Should().Be("CBA");
+        result.Should().Be(expected);
     }
 
-    [Fact]
-    public void ValidInput_PassedFromSyncToNone_ReturnsNone()
+    [Theory, MemberData(nameof(ReturnsNone))]
+    public void SyncToNone(string input, Result<None> expected)
     {
-        Result<None> result = TestService.ReverseString("abc")
+        Result<None> result = TestService.ReverseString(input)
             .Then(s => TestService.DoNothing(s));
 
-        result.Should().Be(Result.None);
+        result.Should().Be(expected);
     }
 
-    [Fact]
-    public async Task ValidInput_PassedFromSyncToNoneAsync_ReturnsNone()
+    [Theory, MemberData(nameof(ReturnsNone))]
+    public async Task SyncToNoneAsync(string input, Result<None> expected)
     {
-        Result<None> result = await TestService.ReverseString("abc")
+        Result<None> result = await TestService.ReverseString(input)
             .Then(s => TestService.DoNothingAsync(s));
 
-        result.Should().Be(Result.None);
+        result.Should().Be(expected);
     }
 
-    [Fact]
-    public void InvalidInput_PassedFromSyncToSync_ReturnsError()
+    [Theory, MemberData(nameof(ReturnsUpperCaseAndReverse))]
+    public async Task AsyncToSync(string input, Result<string> expected)
     {
-        Result<string> result = TestService.ReverseString("")
+        Result<string> result = await TestService.ReverseStringAsync(input)
             .Then(s => TestService.ToUpperCase(s));
 
-        result.Should().Be(new Error("Input value can't be empty"));
+        result.Should().Be(expected);
     }
 
-    [Fact]
-    public async Task InvalidInput_PassedFromSyncToAsync_ReturnsError()
+    [Theory, MemberData(nameof(ReturnsUpperCaseAndReverse))]
+    public async Task AsyncToAsync(string input, Result<string> expected)
     {
-        Result<string> result = await TestService.ReverseString("")
+        Result<string> result = await TestService.ReverseStringAsync(input)
             .Then(s => TestService.ToUpperCaseAsync(s));
 
-        result.Should().Be(new Error("Input value can't be empty"));
+        result.Should().Be(expected);
     }
 
-    [Fact]
-    public void InvalidInput_PassedFromSyncToNone_ReturnsError()
+    [Theory, MemberData(nameof(ReturnsNone))]
+    public async Task AsyncToNone(string input, Result<None> expected)
     {
-        Result<None> result = TestService.ReverseString("")
+        Result<None> result = await TestService.ReverseStringAsync(input)
             .Then(s => TestService.DoNothing(s));
 
-        result.Should().Be(new Error("Input value can't be empty"));
+        result.Should().Be(expected);
     }
 
-    [Fact]
-    public async Task InvalidInput_PassedFromSyncToNoneAsync_ReturnsNone()
+    [Theory, MemberData(nameof(ReturnsNone))]
+    public async Task AsyncToNoneAsync(string input, Result<None> expected)
     {
-        Result<None> result = await TestService.ReverseString("")
+        Result<None> result = await TestService.ReverseStringAsync(input)
             .Then(s => TestService.DoNothingAsync(s));
 
-        result.Should().Be(new Error("Input value can't be empty"));
-    }
-}
-
-public class AsyncTests
-{
-    [Fact]
-    public async Task ValidInput_PassedFromAsyncToSync_ReturnsValue()
-    {
-        Result<string> result = await TestService.ReverseStringAsync("abc")
-            .Then(s => TestService.ToUpperCase(s));
-
-        result.Should().Be("CBA");
+        result.Should().Be(expected);
     }
 
-    [Fact]
-    public async Task ValidInput_PassedFromAsyncToAsync_ReturnsValue()
+    [Theory, MemberData(nameof(ReturnsUpperCase))]
+    public void NoneToSync(string input, Result<string> expected)
     {
-        Result<string> result = await TestService.ReverseStringAsync("abc")
-            .Then(s => TestService.ToUpperCaseAsync(s));
+        Result<string> result = TestService.DoNothing(input)
+            .Then(_ => TestService.ToUpperCase(input));
 
-        result.Should().Be("CBA");
+        result.Should().Be(expected);
     }
 
-    [Fact]
-    public async Task ValidInput_PassedFromAsyncToNone_ReturnsValue()
+    [Theory, MemberData(nameof(ReturnsUpperCase))]
+    public async Task NoneToAsync(string input, Result<string> expected)
     {
-        Result<None> result = await TestService.ReverseStringAsync("abc")
-            .Then(s => TestService.DoNothing(s));
+        Result<string> result = await TestService.DoNothing(input)
+            .Then(_ => TestService.ToUpperCaseAsync(input));
 
-        result.Should().Be(Result.None);
+        result.Should().Be(expected);
     }
 
-    [Fact]
-    public async Task ValidInput_PassedFromAsyncToNoneAsync_ReturnsValue()
+    [Theory, MemberData(nameof(ReturnsNone))]
+    public void NoneToNone(string input, Result<None> expected)
     {
-        Result<None> result = await TestService.ReverseStringAsync("abc")
-            .Then(s => TestService.DoNothingAsync(s));
+        Result<None> result = TestService.DoNothing(input)
+            .Then(_ => TestService.DoNothing(input));
 
-        result.Should().Be(Result.None);
+        result.Should().Be(expected);
     }
 
-    [Fact]
-    public async Task InvalidInput_PassedFromAsyncToSync_ReturnsError()
+    [Theory, MemberData(nameof(ReturnsNone))]
+    public async Task NoneToNoneAsync(string input, Result<None> expected)
     {
-        Result<string> result = await TestService.ReverseStringAsync("")
-            .Then(s => TestService.ToUpperCase(s));
+        Result<None> result = await TestService.DoNothing(input)
+            .Then(_ => TestService.DoNothingAsync(input));
 
-        result.Should().Be(new Error("Input value can't be empty"));
+        result.Should().Be(expected);
     }
 
-    [Fact]
-    public async Task InvalidInput_PassedFromAsyncToAsync_ReturnsError()
+    [Theory, MemberData(nameof(ReturnsUpperCase))]
+    public async void NoneAsyncToSync(string input, Result<string> expected)
     {
-        Result<string> result = await TestService.ReverseStringAsync("")
-            .Then(s => TestService.ToUpperCaseAsync(s));
+        Result<string> result = await TestService.DoNothingAsync(input)
+            .Then(_ => TestService.ToUpperCase(input));
 
-        result.Should().Be(new Error("Input value can't be empty"));
+        result.Should().Be(expected);
     }
 
-    [Fact]
-    public async Task InvalidInput_PassedFromAsyncToNone_ReturnsError()
+    [Theory, MemberData(nameof(ReturnsUpperCase))]
+    public async Task NoneAsyncToAsync(string input, Result<string> expected)
     {
-        Result<None> result = await TestService.ReverseStringAsync("")
-            .Then(s => TestService.DoNothing(s));
+        Result<string> result = await TestService.DoNothingAsync(input)
+            .Then(_ => TestService.ToUpperCaseAsync(input));
 
-        result.Should().Be(new Error("Input value can't be empty"));
+        result.Should().Be(expected);
     }
 
-     [Fact]
-    public async Task InvalidInput_PassedFromAsyncToNoneAsync_ReturnsError()
+    [Theory, MemberData(nameof(ReturnsNone))]
+    public async void NoneAsyncToNone(string input, Result<None> expected)
     {
-        Result<None> result = await TestService.ReverseStringAsync("")
-            .Then(s => TestService.DoNothingAsync(s));
+        Result<None> result = await TestService.DoNothingAsync(input)
+            .Then(_ => TestService.DoNothing(input));
 
-        result.Should().Be(new Error("Input value can't be empty"));
-    }
-}
-
-public class NoneTests
-{
-    [Fact]
-    public void ValidInput_PassedFromNoneToSync_ReturnsValue()
-    {
-        Result<string> result = TestService.DoNothing("abc")
-            .Then(s => TestService.ToUpperCase(s));
-
-        result.Should().Be("CBA");
+        result.Should().Be(expected);
     }
 
-    [Fact]
-    public async Task ValidInput_PassedFromNoneToAsync_ReturnsValue()
+    [Theory, MemberData(nameof(ReturnsNone))]
+    public async Task NoneAsyncToNoneAsync(string input, Result<None> expected)
     {
-        Result<string> result = await TestService.ReverseStringAsync("abc")
-            .Then(s => TestService.ToUpperCaseAsync(s));
+        Result<None> result = await TestService.DoNothingAsync(input)
+            .Then(_ => TestService.DoNothingAsync(input));
 
-        result.Should().Be("CBA");
-    }
-
-    [Fact]
-    public async Task ValidInput_PassedFromNoneToNone_ReturnsValue()
-    {
-        Result<None> result = await TestService.ReverseStringAsync("abc")
-            .Then(s => TestService.DoNothing(s));
-
-        result.Should().Be(Result.None);
-    }
-
-    [Fact]
-    public async Task InvalidInput_PassedFromNoneToSync_ReturnsError()
-    {
-        Result<string> result = await TestService.ReverseStringAsync("")
-            .Then(s => TestService.ToUpperCase(s));
-
-        result.Should().Be(new Error("Input value can't be empty"));
-    }
-
-    [Fact]
-    public async Task InvalidInput_PassedFromNoneToAsync_ReturnsError()
-    {
-        Result<string> result = await TestService.ReverseStringAsync("")
-            .Then(s => TestService.ToUpperCaseAsync(s));
-
-        result.Should().Be(new Error("Input value can't be empty"));
-    }
-
-    [Fact]
-    public async Task InvalidInput_PassedFromNoneToNone_ReturnsError()
-    {
-        Result<None> result = await TestService.ReverseStringAsync("")
-            .Then(s => TestService.DoNothing(s));
-
-        result.Should().Be(new Error("Input value can't be empty"));
-    }
-}
-
-public class FlowTests
-{
-    [Fact]
-    public void WhenValidInput_ReturnsValidResult()
-    {
-        Result<string> result = TestService.ReverseString("abc");
-
-        result.Should().Be("cba");
-    }
-
-    [Fact]
-    public void WhenFailedInput_ReturnsError()
-    {
-        Result<string> result = TestService.ReverseString("  ");
-
-        result.Should().Be(new Error("Input value can't be empty"));
-    }
-
-    [Fact]
-    public void Then_WhenValidInput_ProperlyPassedToNextMethod()
-    {
-        Result<string> result = TestService.ReverseString("abc")
-            .Then(s => TestService.ToUpperCase(s));
-
-        result.Should().Be("CBA");
-    }
-
-    [Fact]
-    public void Then_WhenError_ProperlyPassesIt()
-    {
-        Result<string> result = TestService.ReverseString("    ")
-            .Then(s => TestService.ToUpperCase(s));
-
-        result.Should().Be(new Error("Input value can't be empty"));
-    }
-
-
-    [Fact]
-    public void IfError_WhenValidInput_ProperlyPassedToNextMethod()
-    {
-        string errorMessage = string.Empty;
-        Result<string> result = TestService.ReverseString("abc")
-            .IfError(e => errorMessage = e.Message)
-            .Then(s => TestService.ToUpperCase(s));
-
-        result.Should().Be("CBA");
-    }
-
-    [Fact]
-    public void IfError_WhenError_ThenItCanBeHandledAlso()
-    {
-        string errorMessage = string.Empty;
-        Result<string> result = TestService.ReverseString("    ")
-            .IfError(e => errorMessage = $"message logged: {e.Message}")
-            .Then(s => TestService.ToUpperCase(s));
-
-        errorMessage.Should().Be("message logged: Input value can't be empty");
-        result.Should().Be(new Error("Input value can't be empty"));
-    }
-}
-
-public class AsyncFlowTests
-{
-    [Fact]
-    public async Task WhenValidInput_ReturnsValidResult()
-    {
-        Result<string> result = await TestService.ReverseStringAsync("abc");
-
-        result.Should().Be("cba");
-    }
-
-    [Fact]
-    public async Task WhenFailedInput_ReturnsError()
-    {
-        Result<string> result = await TestService.ReverseStringAsync("  ");
-
-        result.Should().Be(new Error("Input value can't be empty"));
-    }
-
-    [Fact]
-    public async Task WhenValidInput_ThenProperlyPassedToNextMethod()
-    {
-        Result<string> result = await TestService.ReverseStringAsync("abc")
-            .Then(s => TestService.ToUpperCaseAsync(s));
-
-        result.Should().Be("CBA");
-    }
-
-    [Fact]
-    public async Task IfError_ThenProperlyPassesIt()
-    {
-        Result<string> result = await TestService.ReverseStringAsync("    ")
-            .Then(s => TestService.ToUpperCaseAsync(s));
-
-        result.Should().Be(new Error("Input value can't be empty"));
-    }
-
-    [Fact]
-    public async Task IfError_WhenValidInput_ProperlyPassedToNextMethodAsync()
-    {
-        string errorMessage = string.Empty;
-        Result<string> result = await TestService.ReverseStringAsync("abc")
-            .IfError(e => errorMessage = e.Message)
-            .Then(s => TestService.ToUpperCaseAsync(s));
-
-        result.Should().Be("CBA");
-    }
-
-    [Fact]
-    public async Task IfError_WhenError_ThenItCanBeHandledAlso()
-    {
-        string errorMessage = string.Empty;
-        Result<string> result = await TestService.ReverseStringAsync("    ")
-            .IfError(e => errorMessage = $"message logged: {e.Message}")
-            .Then(s => TestService.ToUpperCaseAsync(s));
-
-        errorMessage.Should().Be("message logged: Input value can't be empty");
-        result.Should().Be(new Error("Input value can't be empty"));
-    }
-}
-
-public class FirstSyncThenAsyncFlowTests
-{
-    [Fact]
-    public async Task WhenValidInput_ThenProperlyPassedToNextMethodAsync()
-    {
-        Result<string> result = await TestService.ReverseString("abc")
-            .Then(s => TestService.ToUpperCaseAsync(s));
-
-        result.Should().Be("CBA");
-    }
-
-    [Fact]
-    public async Task IfError_ThenProperlyPassesItAsync()
-    {
-        Result<string> result = await TestService.ReverseString("    ")
-            .Then(s => TestService.ToUpperCaseAsync(s));
-
-        result.Should().Be(new Error("Input value can't be empty"));
-    }
-
-    [Fact]
-    public async Task IfError_WhenValidInput_ProperlyPassedToNextMethodAsync()
-    {
-        string errorMessage = string.Empty;
-        Result<string> result = await TestService.ReverseString("abc")
-            .IfError(e => errorMessage = e.Message)
-            .Then(s => TestService.ToUpperCaseAsync(s));
-
-        result.Should().Be("CBA");
-    }
-
-    [Fact]
-    public async Task IfError_WhenError_ThenItCanBeHandledAlso()
-    {
-        string errorMessage = string.Empty;
-        Result<string> result = await TestService.ReverseString("    ")
-            .IfError(e => errorMessage = $"message logged: {e.Message}")
-            .Then(s => TestService.ToUpperCaseAsync(s));
-
-        errorMessage.Should().Be("message logged: Input value can't be empty");
-        result.Should().Be(new Error("Input value can't be empty"));
-    }
-}
-
-public class FirstAsyncThenSyncFlowTests
-{
-    [Fact]
-    public async Task WhenValidInput_ThenProperlyPassedToNextMethodAsync()
-    {
-        Result<string> result = await TestService.ReverseStringAsync("abc")
-            .Then(s => TestService.ToUpperCase(s));
-
-        result.Should().Be("CBA");
-    }
-
-    [Fact]
-    public async Task IfError_ThenProperlyPassesItAsync()
-    {
-        Result<string> result = await TestService.ReverseStringAsync("    ")
-            .Then(s => TestService.ToUpperCase(s));
-
-        result.Should().Be(new Error("Input value can't be empty"));
-    }
-
-    [Fact]
-    public async Task IfError_WhenValidInput_ProperlyPassedToNextMethodAsync()
-    {
-        string errorMessage = string.Empty;
-        Result<string> result = await TestService.ReverseStringAsync("abc")
-            .IfError(e => errorMessage = e.Message)
-            .Then(s => TestService.ToUpperCase(s));
-
-        result.Should().Be("CBA");
-    }
-
-    [Fact]
-    public async Task IfError_WhenError_ThenItCanBeHandledAlso()
-    {
-        string errorMessage = string.Empty;
-        Result<string> result = await TestService.ReverseStringAsync("    ")
-            .IfError(e => errorMessage = $"message logged: {e.Message}")
-            .Then(s => TestService.ToUpperCase(s));
-
-        errorMessage.Should().Be("message logged: Input value can't be empty");
-        result.Should().Be(new Error("Input value can't be empty"));
-    }
-}
-
-public class NoValueTests
-{
-    [Fact]
-    public void WhenValidInput_ReturnsValidResult()
-    {
-        Result<None> result = TestService.DoNothing("abc");
-
-        result.Should().Be(Result.None);
-    }
-
-    [Fact]
-    public void WhenFailedInput_ReturnsError()
-    {
-        Result<None> result = TestService.DoNothing("  ");
-
-        result.Should().Be(new Error("Input value can't be empty"));
-    }
-
-    [Fact]
-    public void WhenValidInput_ThenNextMethodInvoked()
-    {
-        string s = "cba";
-        Result<string> result = TestService.DoNothing("abc")
-            .Then(_ => TestService.ToUpperCase(s));
-
-        result.Should().Be("CBA");
-    }
-
-    [Fact]
-    public void IfError_ThenProperlyPassesIt()
-    {
-        string s = "cba";
-        Result<string> result = TestService.DoNothing("    ")
-            .Then(_ => TestService.ToUpperCase(s));
-
-        result.Should().Be(new Error("Input value can't be empty"));
-    }
-
-    [Fact]
-    public async Task WhenValidInput_ThenAsync_AsyncMethodInvokedAsync()
-    {
-        string s = "cba";
-        Result<string> result = await TestService.DoNothing("abc")
-            .Then(_ => TestService.ToUpperCaseAsync(s));
-
-        result.Should().Be("CBA");
-    }
-
-    [Fact]
-    public async Task IfError_ThenAsync_ErrorProperlyPassedAsync()
-    {
-        string s = "cba";
-        Result<string> result = await TestService.DoNothing("    ")
-            .Then(_ => TestService.ToUpperCaseAsync(s));
-
-        result.Should().Be(new Error("Input value can't be empty"));
-    }
-
-    [Fact]
-    public async Task IfError_WhenValidInput_ProperlyPassedToNextAsyncMethodAsync()
-    {
-        string errorMessage = string.Empty;
-        string s = "cba";
-        Result<string> result = await TestService.DoNothing("abc")
-            .IfError(e => errorMessage = e.Message)
-            .Then(_ => TestService.ToUpperCaseAsync(s));
-
-        result.Should().Be("CBA");
-    }
-
-    [Fact]
-    public async Task IfError_WhenError_ThenItCanBeHandledAlsoAsync()
-    {
-        string errorMessage = string.Empty;
-        string s = "cba";
-        Result<string> result = await TestService.DoNothing("    ")
-            .IfError(e => errorMessage = $"message logged: {e.Message}")
-            .Then(_ => TestService.ToUpperCaseAsync(s));
-
-        errorMessage.Should().Be("message logged: Input value can't be empty");
-        result.Should().Be(new Error("Input value can't be empty"));
+        result.Should().Be(expected);
     }
 }
