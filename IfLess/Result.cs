@@ -53,11 +53,6 @@ public sealed class Right<TRight> : Result<TRight>
     {
         return RuntimeHelpers.GetHashCode(this);
     }
-
-    //public override Result<TRight> WhenError(Action<Error> errorHandler)
-    //{
-    //    return this;
-    //}
 }
 
 public sealed class None
@@ -100,9 +95,8 @@ internal sealed class Wrong<TRight> : Result<TRight>, IWrong
     {
         return obj switch
         {
-            // TODO: proper equality here!
-            Error error => Error.Message == error.Message,
-            Wrong<TRight> wrong => Error.Message == wrong.Error.Message,
+            Error error => GetHashCode() == error.GetHashCode(),
+            Wrong<TRight> wrong => GetHashCode() == wrong.GetHashCode(),
             _ => false,
         };
     }
@@ -111,11 +105,6 @@ internal sealed class Wrong<TRight> : Result<TRight>, IWrong
     {
         return RuntimeHelpers.GetHashCode(this);
     }
-
-    //public override Result<TRight> WhenError(Action<Error> errorHandler)
-    //{
-    //    throw new NotImplementedException();
-    //}
 }
 
 public class Error
@@ -131,8 +120,8 @@ public class Error
     {
         return obj switch
         {
-            Error error => Message == error.Message,
-            IWrong wrong => Message == wrong.Error.Message,
+            Error error => GetHashCode() == error.GetHashCode(),
+            IWrong wrong => GetHashCode() == wrong.GetHashCode(),
             _ => false,
         };
     }
