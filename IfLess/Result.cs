@@ -121,17 +121,20 @@ public class Error
 {
     public string Message { get; }
 
-    public Error(string message)
+    public IEnumerable<Error> InnerErrors { get; }
+
+    public Error(string message, params Error[] innerErrors)
     {
         Message = message;
+        InnerErrors = innerErrors;
     }
 
     public override bool Equals(object? obj)
     {
         return obj switch
         {
-            Error error => Message == error.Message,
-            IWrong wrong => Message == wrong.Error.Message,
+            Error error => GetHashCode() == error.GetHashCode(),
+            IWrong wrong => GetHashCode() == wrong.GetHashCode(),
             _ => false,
         };
     }
@@ -169,7 +172,7 @@ public static class ResultExtensions
         {
             Right<TRight> right => right,
             Wrong<TRight> wrong => HandleError(wrong.Error),
-            _ => throw new InvalidOperationException("It can not happen!"),
+            _ => throw new InvalidOperationException("It cannot happen!"),
         };
     }
 
@@ -187,7 +190,7 @@ public static class ResultExtensions
         {
             Right<TRight> right => right,
             Wrong<TRight> wrong => HandleError(wrong.Error),
-            _ => throw new InvalidOperationException("It can not happen!"),
+            _ => throw new InvalidOperationException("It cannot happen!"),
         };
     }
 }

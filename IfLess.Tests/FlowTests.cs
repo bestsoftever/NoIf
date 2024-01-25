@@ -162,3 +162,27 @@ public class ThenTests
         result.Should().Be(expected);
     }
 }
+
+public class NoneTests
+{
+
+    [Fact]
+    public void NoneIsNone()
+    {
+        Result.None.Should().Be(Result.None);
+    }
+
+    [Fact]
+    public void ErrorWorks()
+    {
+        var error = DoStuff();
+        var result = error.Then<bool>(x => x.StartsWith("a"));
+
+        result.Should().Be(new Error("wrong!"));
+    }
+
+    public Result<string> DoStuff()
+    {
+        return new Error("wrong!");
+    }
+}
