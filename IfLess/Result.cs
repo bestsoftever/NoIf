@@ -53,11 +53,6 @@ public sealed class Right<TRight> : Result<TRight>
     {
         return RuntimeHelpers.GetHashCode(this);
     }
-
-    //public override Result<TRight> WhenError(Action<Error> errorHandler)
-    //{
-    //    return this;
-    //}
 }
 
 public sealed class None
@@ -72,11 +67,18 @@ public static class Result
     public static None None { get; } = new();
 }
 
+/// <summary>
+/// Why we need this?
+/// </summary>
 internal interface IWrong
 {
     Error Error { get; }
 }
 
+/// <summary>
+/// Wrapper over Error, so you can have non-generic Error for generic Result<T>
+/// </summary>
+/// <typeparam name="TRight"></typeparam>
 internal sealed class Wrong<TRight> : Result<TRight>, IWrong
 {
     public Error Error { get; init; }
@@ -100,24 +102,21 @@ internal sealed class Wrong<TRight> : Result<TRight>, IWrong
     {
         return obj switch
         {
-            // TODO: proper equality here!
-            Error error => Error.Message == error.Message,
-            Wrong<TRight> wrong => Error.Message == wrong.Error.Message,
+            Error error => Error.Equals(error),
+            Wrong<TRight> wrong => Error.Equals(wrong),
             _ => false,
         };
     }
 
     public override int GetHashCode()
     {
-        return RuntimeHelpers.GetHashCode(this);
+        return Error.GetHashCode();
     }
-
-    //public override Result<TRight> WhenError(Action<Error> errorHandler)
-    //{
-    //    throw new NotImplementedException();
-    //}
 }
 
+/// <summary>
+/// Base class for errors
+/// </summary>
 public class Error
 {
     public string Message { get; }
