@@ -67,11 +67,18 @@ public static class Result
     public static None None { get; } = new();
 }
 
+/// <summary>
+/// Why we need this?
+/// </summary>
 internal interface IWrong
 {
     Error Error { get; }
 }
 
+/// <summary>
+/// Wrapper over Error, so you can have non-generic Error for generic Result<T>
+/// </summary>
+/// <typeparam name="TRight"></typeparam>
 internal sealed class Wrong<TRight> : Result<TRight>, IWrong
 {
     public Error Error { get; init; }
@@ -95,18 +102,21 @@ internal sealed class Wrong<TRight> : Result<TRight>, IWrong
     {
         return obj switch
         {
-            Error error => GetHashCode() == error.GetHashCode(),
-            Wrong<TRight> wrong => GetHashCode() == wrong.GetHashCode(),
+            Error error => Error.Equals(error),
+            Wrong<TRight> wrong => Error.Equals(wrong),
             _ => false,
         };
     }
 
     public override int GetHashCode()
     {
-        return RuntimeHelpers.GetHashCode(this);
+        return Error.GetHashCode();
     }
 }
 
+/// <summary>
+/// Base class for errors
+/// </summary>
 public class Error
 {
     public string Message { get; }
@@ -120,8 +130,8 @@ public class Error
     {
         return obj switch
         {
-            Error error => GetHashCode() == error.GetHashCode(),
-            IWrong wrong => GetHashCode() == wrong.GetHashCode(),
+            Error error => Message == error.Message,
+            IWrong wrong => Message == wrong.Error.Message,
             _ => false,
         };
     }
