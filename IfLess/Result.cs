@@ -133,8 +133,8 @@ public class Error
     {
         return obj switch
         {
-            Error error => GetHashCode() == error.GetHashCode(),
-            IWrong wrong => GetHashCode() == wrong.GetHashCode(),
+            Error error => Message == error.Message,
+            IWrong wrong => Message == wrong.Error.Message,
             _ => false,
         };
     }
