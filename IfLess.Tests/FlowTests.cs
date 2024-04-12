@@ -173,6 +173,20 @@ public class NoneTests
     {
         Result.None.Should().Be(Result.None);
     }
+}
+
+public class ErrorTests
+{
+    [Fact]
+    public void SimpleErrorWorks()
+    {
+        var error = DoStuff();
+        var result = error.Then<bool>(x => x.StartsWith("a"));
+
+        result.Should().Be(new Error("wrong!"));
+
+        static Result<string> DoStuff() => new Error("wrong!");
+    }
 
     [Fact]
     public void ErrorWorks()
@@ -180,11 +194,8 @@ public class NoneTests
         var error = DoStuff();
         var result = error.Then<bool>(x => x.StartsWith("a"));
 
-        result.Should().Be(new Error("wrong!"));
-    }
+        result.Should().Be(new Error("Some error", new Error("Some inner error"), new Error("Another inner error")));
 
-    public Result<string> DoStuff()
-    {
-        return new Error("wrong!");
+        static Result<string> DoStuff() => new Error("Some error", new Error("Some inner error"), new Error("Another inner error"));
     }
 }
