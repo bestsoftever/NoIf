@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace IfLess;
 
@@ -23,7 +24,7 @@ public sealed class Right<TRight> : Result<TRight>
     {
         if (value == null)
         {
-            throw new Exception("NO.");
+            throw new Exception("A literal that represents a non-existing reference is not a proper value of anything. If you'd like to represent the lack of a value, please use Result.None.");
         }
 
         Value = value;
@@ -68,7 +69,7 @@ public static class Result
 }
 
 /// <summary>
-/// Why we need this?
+/// Non-generic interface for non-generic type in generic hierarchy
 /// </summary>
 internal interface IWrong
 {
@@ -121,19 +122,27 @@ public class Error
 {
     public string Message { get; }
 
-    public Error(string message)
+    public IEnumerable<Error> InnerErrors { get; }
+
+    public Error(string message, params Error[] innerErrors)
     {
         Message = message;
+        InnerErrors = innerErrors;
     }
 
     public override bool Equals(object? obj)
     {
         return obj switch
         {
-            Error error => Message == error.Message,
-            IWrong wrong => Message == wrong.Error.Message,
+            Error error => Equals(this, error),
+            IWrong wrong => Equals(this, wrong.Error),
             _ => false,
         };
+    }
+
+    private bool Equals(Error first, Error second)
+    {
+        return first.Message == second.Message && first.InnerErrors.SequenceEqual(second.InnerErrors);
     }
 
     public override int GetHashCode()
@@ -169,7 +178,7 @@ public static class ResultExtensions
         {
             Right<TRight> right => right,
             Wrong<TRight> wrong => HandleError(wrong.Error),
-            _ => throw new InvalidOperationException("It can not happen!"),
+            _ => throw new InvalidOperationException("It cannot happen!"),
         };
     }
 
@@ -187,7 +196,7 @@ public static class ResultExtensions
         {
             Right<TRight> right => right,
             Wrong<TRight> wrong => HandleError(wrong.Error),
-            _ => throw new InvalidOperationException("It can not happen!"),
+            _ => throw new InvalidOperationException("It cannot happen!"),
         };
     }
 }
