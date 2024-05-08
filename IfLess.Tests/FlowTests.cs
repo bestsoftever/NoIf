@@ -194,16 +194,16 @@ public class ErrorTests
         var error = DoStuff();
         var result = error.Then<bool>(x => x.StartsWith("a"));
 
-        result.Should().Be(new Error("Some error", new Error("Some inner error"), new Error("Another inner error")));
+        result.Should().Be(new Error("Some error"));
 
-        static Result<string> DoStuff() => new Error("Some error", new Error("Some inner error"), new Error("Another inner error"));
+        static Result<string> DoStuff() => new Error("Some error");
     }
 
     [Fact]
     public void SameErrorsAreEqual()
     {
-        new Error("Some error", new Error("Some inner error"), new Error("Another inner error"))
-            .Should().Be(new Error("Some error", new Error("Some inner error"), new Error("Another inner error")));
+        new Error("Some error", new Error("Some inner error", new Error("Very inner error")), new Error("Another inner error"))
+            .Should().Be(new Error("Some error", new Error("Some inner error", new Error("Very inner error")), new Error("Another inner error")));
     }
 
     [Fact]

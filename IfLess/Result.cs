@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace IfLess;
 
@@ -141,7 +142,7 @@ public class Error
 
     private bool Equals(Error first, Error second)
     {
-        return first.Message == second.Message && first.InnerErrors == second.InnerErrors;
+        return first.Message == second.Message && first.InnerErrors.SequenceEqual(second.InnerErrors);
     }
 
     public override int GetHashCode()
