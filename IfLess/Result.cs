@@ -68,7 +68,7 @@ public static class Result
 }
 
 /// <summary>
-/// Why we need this?
+/// Non-generic interface for non-generic type in generic hierarchy
 /// </summary>
 internal interface IWrong
 {
@@ -133,10 +133,15 @@ public class Error
     {
         return obj switch
         {
-            Error error => Message == error.Message,
-            IWrong wrong => Message == wrong.Error.Message,
+            Error error => Equals(this, error),
+            IWrong wrong => Equals(this, wrong.Error),
             _ => false,
         };
+    }
+
+    private bool Equals(Error first, Error second)
+    {
+        return first.Message == second.Message && first.InnerErrors == second.InnerErrors;
     }
 
     public override int GetHashCode()

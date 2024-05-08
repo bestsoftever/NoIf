@@ -198,4 +198,39 @@ public class ErrorTests
 
         static Result<string> DoStuff() => new Error("Some error", new Error("Some inner error"), new Error("Another inner error"));
     }
+
+    [Fact]
+    public void SameErrorsAreEqual()
+    {
+        new Error("Some error", new Error("Some inner error"), new Error("Another inner error"))
+            .Should().Be(new Error("Some error", new Error("Some inner error"), new Error("Another inner error")));
+    }
+
+    [Fact]
+    public void WhenErrorMessagesDiffers_ErrorsAreNotEqual()
+    {
+        new Error("Some error")
+            .Should().NotBe(new Error("Some issue"));
+    }
+
+    [Fact]
+    public void WhenOneErrorHasEmptyInnerErrors_ErrorsAreNotEqual()
+    {
+        new Error("Some error", new Error("Some inner error"), new Error("Another inner error"))
+            .Should().NotBe(new Error("Some error"));
+    }
+
+    [Fact]
+    public void WhenInnerErrorsHaveDifferentItemsCount_ErrorsAreNotEqual()
+    {
+        new Error("Some error", new Error("Some inner error"), new Error("Another inner error"), new Error("Additional error"))
+            .Should().NotBe(new Error("Some error", new Error("Some inner error"), new Error("Another inner error")));
+    }
+
+    [Fact]
+    public void WhenInnerErrorsHaveDifferentMessage_ErrorsAreNotEqual()
+    {
+        new Error("Some error", new Error("Some inner errr"), new Error("Another inner error"))
+            .Should().NotBe(new Error("Some error", new Error("Some inner error"), new Error("Another inner error")));
+    }
 }
