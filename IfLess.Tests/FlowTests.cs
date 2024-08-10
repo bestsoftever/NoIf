@@ -10,11 +10,13 @@ public class ThenTests
         yield return new object[] { "abc", "ABC" };
         yield return new object[] { "", new Error("Input value can't be empty") };
     }
+
     public static IEnumerable<object[]> ReturnsUpperCaseAndReverse()
     {
         yield return new object[] { "abc", "CBA" };
         yield return new object[] { "", new Error("Input value can't be empty") };
     }
+    
     public static IEnumerable<object[]> ReturnsNone()
     {
         yield return new object[] { "abc", Result.None };

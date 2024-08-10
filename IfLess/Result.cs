@@ -165,7 +165,7 @@ public static class ResultExtensions
         return await (await task).Then(func);
     }
 
-    public static Result<TRight> IfError<TRight>(
+    public static Result<TRight> ThenError<TRight>(
         this Result<TRight> result, Action<Error> errorHandler)
     {
         Error HandleError(Error error)
@@ -182,7 +182,7 @@ public static class ResultExtensions
         };
     }
 
-    public static async Task<Result<TRight>> IfError<TRight>(
+    public static async Task<Result<TRight>> ThenError<TRight>(
         this Task<Result<TRight>> task, Action<Error> errorHandler)
     {
         Error HandleError(Error error)
