@@ -1,5 +1,46 @@
 namespace IfLess.Tests;
 
+
+
+public class SwapReturnTypesTests
+{
+    class NotAnError : Error
+    {
+        public NotAnError() : base("Not really an error")
+        {
+        }
+    }
+
+    // class Error2 : Error
+    // {
+    //     public Error2() : base("Error 2")
+    //     {
+    //     }
+    // }
+
+    public static Result<string> DoStuff(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input))
+        {
+            return new Error("Input value can't be empty");
+        }
+
+        return new string(input.Reverse().ToArray());
+    }
+
+    [Fact]
+    public void WhenErrorIsNotAnError_ReturnsSomethingElse()
+    {
+        static Result<string> ReturnError() => new NotAnError();
+
+        Result<string> result = ReturnError()
+            .Swap<NotAnError>(e => "something else")
+            .Then(s => TestService.ToUpperCase(s));
+
+        result.Should().Be("SOMETHING ELSE");
+    }
+}
+
 public class ThenTests
 {
     public static IEnumerable<object[]> ReturnsUpperCase()
@@ -13,7 +54,7 @@ public class ThenTests
         yield return new object[] { "abc", "CBA" };
         yield return new object[] { "", new Error("Input value can't be empty") };
     }
-    
+
     public static IEnumerable<object[]> ReturnsNone()
     {
         yield return new object[] { "abc", Result.None };

@@ -9,6 +9,8 @@ public abstract class Result<TRight>
 
     public abstract Task<Result<TOutput>> Then<TOutput>(Func<TRight, Task<Result<TOutput>>> func);
 
+    public abstract Result<TRight> Swap<TToSwap>(Func<Result<TRight>, Result<TRight>> func);
+
     public static implicit operator Result<TRight>(Error error) => new Wrong<TRight>(error);
 
     public static implicit operator Result<TRight>(TRight data) => new Right<TRight>(data);
@@ -38,6 +40,11 @@ public sealed class Right<TRight> : Result<TRight>
     public override async Task<Result<TOutput>> Then<TOutput>(Func<TRight, Task<Result<TOutput>>> func)
     {
         return await func(Value);
+    }
+
+    public override Result<TRight> Swap<TToSwap>(Func<Result<TRight>, Result<TRight>> func)
+    {
+        return Value!.GetType() == typeof(TToSwap) ? func(Value) : Value;
     }
 
     public override bool Equals(object? obj)
@@ -112,6 +119,11 @@ internal sealed class Wrong<TRight> : Result<TRight>, IWrong
     public override int GetHashCode()
     {
         return Error.GetHashCode();
+    }
+
+    public override Result<TRight> Swap<TToSwap>(Func<Result<TRight>, Result<TRight>> func)
+    {
+        return Error!.GetType() == typeof(TToSwap) ? func(Error) : Error;
     }
 }
 
