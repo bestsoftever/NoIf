@@ -11,6 +11,12 @@ public abstract class Result<TRight>
 
     public abstract Result<TRight> Swap<TToSwap>(Func<Result<TRight>, Result<TRight>> func);
 
+    // public abstract Result<TRight> Handle<TInput>(Func<Result<TInput>, Result<TRight>> func);
+
+    // public abstract Result<TRight> Handle2<TInput>(Func<Result<TInput>, Result<TRight>> func);
+
+    public abstract Result<TRight> HandleError<TError>(Func<Error, Result<TRight>> func) where TError : Error;
+
     public static implicit operator Result<TRight>(Error error) => new Wrong<TRight>(error);
 
     public static implicit operator Result<TRight>(TRight data) => new Right<TRight>(data);
@@ -47,6 +53,11 @@ public sealed class Right<TRight> : Result<TRight>
         return Value!.GetType() == typeof(TToSwap) ? func(Value) : Value;
     }
 
+    // public override Result<TRight> Handle<TInput>(Func<Result<TInput>, Result<TRight>> func)
+    // {
+    //     return Value!.GetType() == typeof(TInput) ? func(Value) : Value;
+    // }
+
     public override bool Equals(object? obj)
     {
         return obj switch
@@ -60,6 +71,11 @@ public sealed class Right<TRight> : Result<TRight>
     public override int GetHashCode()
     {
         return RuntimeHelpers.GetHashCode(this);
+    }
+
+    public override Result<TRight> HandleError<TError>(Func<Error, Result<TRight>> func)
+    {
+        return this;
     }
 }
 
@@ -106,6 +122,21 @@ internal sealed class Wrong<TRight> : Result<TRight>, IWrong
         return await Task.FromResult(Error);
     }
 
+    public override Result<TRight> Swap<TToSwap>(Func<Result<TRight>, Result<TRight>> func)
+    {
+        return Error!.GetType() == typeof(TToSwap) ? func(Error) : Error;
+    }
+
+    // public override Result<TRight> Handle<TInput>(Func<Result<TInput>, Result<TRight>> func)
+    // {
+    //     throw new NotImplementedException();
+    // }
+
+    // public override Result<TRight> Handle<TInput>(Func<Result<TInput>, Result<TRight>> func)
+    // {
+    //     throw new NotImplementedException();
+    // }
+
     public override bool Equals(object? obj)
     {
         return obj switch
@@ -121,9 +152,9 @@ internal sealed class Wrong<TRight> : Result<TRight>, IWrong
         return Error.GetHashCode();
     }
 
-    public override Result<TRight> Swap<TToSwap>(Func<Result<TRight>, Result<TRight>> func)
+    public override Result<TRight> HandleError<TError>(Func<Error, Result<TRight>> func)
     {
-        return Error!.GetType() == typeof(TToSwap) ? func(Error) : Error;
+        return typeof(TError) == this.Error.GetType() ? func(this.Error) : this;
     }
 }
 
@@ -177,6 +208,14 @@ public static class ResultExtensions
         return await (await task).Then(func);
     }
 
+    /// <summary>
+    /// Invokes an action when Result is an error and passes the Result.
+    /// </summary>
+    /// <typeparam name="TRight"></typeparam>
+    /// <param name="result"></param>
+    /// <param name="errorHandler"></param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
     public static Result<TRight> ThenError<TRight>(
         this Result<TRight> result, Action<Error> errorHandler)
     {
@@ -194,6 +233,14 @@ public static class ResultExtensions
         };
     }
 
+    /// <summary>
+    /// Invokes an action when Result is an error and passes the Result.
+    /// </summary>
+    /// <typeparam name="TRight"></typeparam>
+    /// <param name="task"></param>
+    /// <param name="errorHandler"></param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
     public static async Task<Result<TRight>> ThenError<TRight>(
         this Task<Result<TRight>> task, Action<Error> errorHandler)
     {
@@ -211,4 +258,13 @@ public static class ResultExtensions
             _ => throw new InvalidOperationException("It cannot happen!"),
         };
     }
+
+    //public static Result<TRight> Swap<TRight, TToSwap>(this Func<Result<TRight>, Result<TRight>> func)
+    //{
+    //}
+
+    // public static Result<TRight> Handle<TInput>(this Result<TRight> result, Func<Result<TInput>, Result<TRight>> func)
+    // {
+    //     return Value!.GetType() == typeof(TInput) ? func(Value) : Value;
+    // }
 }

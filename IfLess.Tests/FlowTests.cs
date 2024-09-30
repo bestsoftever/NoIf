@@ -1,8 +1,58 @@
+
 namespace IfLess.Tests;
 
+public class HandleErrorsTests
+{
+    // class NotAnError : Error
+    // {
+    //     public NotAnError() : base("Not really an error")
+    //     {
+    //     }
+    // }
+
+    class Error1 : Error
+    {
+        public Error1() : base("Error 1")
+        {
+        }
+    }
+
+    class Error2 : Error
+    {
+        public Error2() : base("Error 2")
+        {
+        }
+    }
+
+    public static Result<string> DoStuff(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input))
+        {
+            return new Error("Input value can't be empty");
+        }
+
+        return new string(input.Reverse().ToArray());
+    }
+
+    [Fact]
+    public void WhenErrorIsNotAnError_ReturnsSomethingElse()
+    {
+        static Result<string> ReturnError() => new Error1();
+
+        string errorMessage = string.Empty;
+        Result<string> result = ReturnError()
+            .HandleError<Error1>(e => errorMessage = $"error1: {e.Message}")
+            .HandleError<Error2>(e => errorMessage = $"error2: {e.Message}")
+            .Then(s => TestService.ToUpperCase(s));
+
+        errorMessage.Should().Be("error1: Error 1");
+        result.Should().Be("SOMETHING ELSE");
+    }
+}
 
 
-public class SwapReturnTypesTests
+
+public class SwapTests
 {
     class NotAnError : Error
     {
@@ -29,7 +79,7 @@ public class SwapReturnTypesTests
     }
 
     [Fact]
-    public void WhenErrorIsNotAnError_ReturnsSomethingElse()
+    public void WhenErrorIsNotAnError_ReturnsValidValue()
     {
         static Result<string> ReturnError() => new NotAnError();
 
@@ -38,6 +88,93 @@ public class SwapReturnTypesTests
             .Then(s => TestService.ToUpperCase(s));
 
         result.Should().Be("SOMETHING ELSE");
+    }
+
+    [Fact]
+    public void WhenErrorIsNotAnError_ReturnsValidValue2()
+    {
+        static Result<string> ReturnError() => "abc";
+
+        Result<string> result = ReturnError()
+            .Swap<NotAnError>(e => "something else")
+            .Then(s => TestService.ToUpperCase(s));
+
+        result.Should().Be("ABC");
+    }
+
+    [Fact]
+    public void WhenValidValueIsAnError_ReturnsError()
+    {
+        static Result<string> ReturnValue() => "abc";
+
+        Result<string> result = ReturnValue()
+            .Swap<string>(e => new Error("weird"))
+            .Then(s => TestService.ToUpperCase(s));
+
+        result.Should().Be(new Error("weird"));
+    }
+
+    [Fact]
+    public void WhenValidValueIsAnError_ReturnsError2()
+    {
+        static Result<string> ReturnValue() => new Error("abc");
+
+        Result<string> result = ReturnValue()
+            .Swap<string>(e => new Error("weird"))
+            .Then(s => TestService.ToUpperCase(s));
+
+        result.Should().Be(new Error("abc"));
+    }
+
+
+    //[Fact]
+    //public void WhenValidValueIsInFactError_ReturnsError()
+    //{
+    //    static Result<string> ReturnValue() => "VALUE";
+
+    //    Result<string> result = ReturnValue()
+    //        .Swap<NotAnError>(e => "something else")
+    //        .Then(s => TestService.ToUpperCase(s));
+
+    //    result.Should().Be("SOMETHING ELSE");
+    //}
+}
+
+
+public class IntegrationTests
+{
+    // The stupidest class hierarchy possible
+    abstract class Animal(string name) { public string Name { get; init; } = name; }
+    sealed class Dog(string name) : Animal(name) { }
+    sealed class Cat(string name) : Animal(name) { }
+
+    [Fact]
+    public void Flow_Works()
+    {
+        static Result<Animal> GetPet() => new Dog("ziomek");
+
+        var result = GetPet()
+            .ThenError(e => Console.WriteLine(e))
+            //.Swap<Dog>(d => new Cat(d.Name))
+            .Then(c => TestService.ToUpperCase(c.GetType().Name));
+
+        result.Should().Be("CAT");
+    }
+
+    [Fact]
+    public void NestedFlow_Works()
+    {
+        static Result<int> GetRandomNumber() => 4;
+        static Result<int> GetBiggerRandomNumber() => 5;
+
+        var result = GetRandomNumber()
+            .Then(x =>
+            {
+                return GetBiggerRandomNumber()
+                    .Then<int>(y => x * y);
+            });
+
+        result.Should().Be(20);
     }
 }
 
@@ -226,17 +363,6 @@ public class ErrorTests
         result.Should().Be(new Error("wrong!"));
 
         static Result<string> DoStuff() => new Error("wrong!");
-    }
-
-    [Fact]
-    public void ErrorWorks()
-    {
-        var error = DoStuff();
-        var result = error.Then<bool>(x => x.StartsWith("a"));
-
-        result.Should().Be(new Error("Some error"));
-
-        static Result<string> DoStuff() => new Error("Some error");
     }
 
     [Fact]
