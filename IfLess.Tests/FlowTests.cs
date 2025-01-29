@@ -160,7 +160,7 @@ public class IntegrationTests
         string errorMessage = string.Empty;
 
         var result = GetRandomPetFromOracle()
-            .Act<Animal, Error>(e => errorMessage = e.Message)
+            .Act<Error>(e => errorMessage = e.Message)
             .Swap<ThisParrotIsDeadError>(e => new Cat("kotek"))
             .Swap<Dog>(d => new Cat(d.Name))
             .Then(c => TestService.ToUpperCase($"{c.GetType().Name} is {c.Name}"));

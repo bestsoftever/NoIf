@@ -12,7 +12,7 @@ public abstract class Result<TRight>
 
     public abstract Result<TRight> Swap<TToSwap>(Func<TToSwap, Result<TRight>> func) where TToSwap : class;
 
-    //public abstract Result<TRight> Act<TToAct>(Action<TToAct> action) where TToAct : class;
+    public abstract Result<TRight> Act<TToAct>(Action<TToAct> action) where TToAct : class;
 
     //public abstract Task<Result<TRight>> ActAsync<TToAct>(Action<TToAct> action) where TToAct : class;
     //{
@@ -62,15 +62,15 @@ public sealed class Right<TRight> : Result<TRight>
         return Value is TToSwap valueToSwap ? func(valueToSwap) : Value;
     }
 
-    //public override Result<TRight> Act<TToAct>(Action<TToAct> action)
-    //{
-    //    if (Value is TToAct valueToAct)
-    //    {
-    //        action(valueToAct);
-    //    }
+    public override Result<TRight> Act<TToAct>(Action<TToAct> action)
+    {
+        if (Value is TToAct valueToAct)
+        {
+            action(valueToAct);
+        }
 
-    //    return Value;
-    //}
+        return Value;
+    }
 
     //public Result<TRight> Act<TToAct>(Action<Result<TRight>> func) where TToAct : class;
     //    {
@@ -168,15 +168,15 @@ internal sealed class Wrong<TRight> : Result<TRight>, IWrong
         return Error is TToSwap errorToSwap ? func(errorToSwap) : Error;
     }
 
-    //public override Result<TRight> Act<TToAct>(Action<TToAct> action)
-    //{
-    //    if (Error is TToAct valueToAct)
-    //    {
-    //        action(valueToAct);
-    //    }
+    public override Result<TRight> Act<TToAct>(Action<TToAct> action)
+    {
+        if (Error is TToAct valueToAct)
+        {
+            action(valueToAct);
+        }
 
-    //    return Error;
-    //}
+        return Error;
+    }
 
     // public override Result<TRight> Handle<TInput>(Func<Result<TInput>, Result<TRight>> func)
     // {
@@ -267,94 +267,94 @@ public static class ResultExtensions
     //public static Task<Result<TRight>> Swap<TToSwap>(Func<TToSwap, Result<TRight>> func) where TToSwap : class;
 
 
-    //public static async Task<Result<TRight>> Act<TRight, TToAct>(this Task<Result<TRight>> task, Action<TToAct> action)
-    //    where TToAct : class
-    //{
-    //    return (await task).Act(action);
-    //}
-
-    //public static async Task<Result<TRight>> Act<TRight, TToAct>(this Task<Result<TRight>> task, Action<Task<TToAct>> action)
-    //    where TToAct : class
-    //{
-    //    return (await task).Act(action);
-    //}
-
-    /// <summary>
-    /// Invokes an action when Result is an error and passes the Result.
-    /// </summary>
-    /// <typeparam name="TRight"></typeparam>
-    /// <param name="result"></param>
-    /// <param name="errorHandler"></param>
-    /// <returns></returns>
-    /// <exception cref="InvalidOperationException"></exception>
-    public static Result<TRight> Act<TRight, TToAct>(this Result<TRight> result, Action<TToAct> action)
-    {
-        Result<TRight> HandleValue(Result<TRight> right)
-        {
-            if (right is TToAct valueToAct)
-            {
-                action(valueToAct);
-            }
-
-            return right;
-        }
-
-        Error HandleError(Error error)
-        {
-            if (error is TToAct valueToAct)
-            {
-                action(valueToAct);
-            }
-
-            return error;
-        }
-
-        return result switch
-        {
-            Right<TRight> right => HandleValue(right),
-            Wrong<TRight> wrong => HandleError(wrong.Error),
-            _ => throw new InvalidOperationException("It cannot happen!"),
-        };
-    }
-
-    /// <summary>
-    /// Invokes an action when Result is an error and passes the Result.
-    /// </summary>
-    /// <typeparam name="TRight"></typeparam>
-    /// <param name="task"></param>
-    /// <param name="errorHandler"></param>
-    /// <returns></returns>
-    /// <exception cref="InvalidOperationException"></exception>
     public static async Task<Result<TRight>> Act<TRight, TToAct>(this Task<Result<TRight>> task, Action<TToAct> action)
+        where TToAct : class
     {
-        Result<TRight> HandleValue(Result<TRight> right)
-        {
-            if (right is TToAct valueToAct)
-            {
-                action(valueToAct);
-            }
-
-            return right;
-        }
-
-        Error HandleError(Error error)
-        {
-            if (error is TToAct valueToAct)
-            {
-                action(valueToAct);
-            }
-
-            return error;
-        }
-
-        var result = await task;
-        return result switch
-        {
-            Right<TRight> right => HandleValue(right),
-            Wrong<TRight> wrong => HandleError(wrong.Error),
-            _ => throw new InvalidOperationException("It cannot happen!"),
-        };
+        return (await task).Act(action);
     }
+
+    public static async Task<Result<TRight>> Act<TRight, TToAct>(this Task<Result<TRight>> task, Action<Task<TToAct>> action)
+        where TToAct : class
+    {
+        return (await task).Act(action);
+    }
+
+    ///// <summary>
+    ///// Invokes an action when Result is an error and passes the Result.
+    ///// </summary>
+    ///// <typeparam name="TRight"></typeparam>
+    ///// <param name="result"></param>
+    ///// <param name="errorHandler"></param>
+    ///// <returns></returns>
+    ///// <exception cref="InvalidOperationException"></exception>
+    //public static Result<TRight> Act<TRight, TToAct>(this Result<TRight> result, Action<TToAct> action)
+    //{
+    //    Result<TRight> HandleValue(Result<TRight> right)
+    //    {
+    //        if (right is TToAct valueToAct)
+    //        {
+    //            action(valueToAct);
+    //        }
+
+    //        return right;
+    //    }
+
+    //    Error HandleError(Error error)
+    //    {
+    //        if (error is TToAct valueToAct)
+    //        {
+    //            action(valueToAct);
+    //        }
+
+    //        return error;
+    //    }
+
+    //    return result switch
+    //    {
+    //        Right<TRight> right => HandleValue(right),
+    //        Wrong<TRight> wrong => HandleError(wrong.Error),
+    //        _ => throw new InvalidOperationException("It cannot happen!"),
+    //    };
+    //}
+
+    ///// <summary>
+    ///// Invokes an action when Result is an error and passes the Result.
+    ///// </summary>
+    ///// <typeparam name="TRight"></typeparam>
+    ///// <param name="task"></param>
+    ///// <param name="errorHandler"></param>
+    ///// <returns></returns>
+    ///// <exception cref="InvalidOperationException"></exception>
+    //public static async Task<Result<TRight>> Act<TRight, TToAct>(this Task<Result<TRight>> task, Action<TToAct> action)
+    //{
+    //    Result<TRight> HandleValue(Result<TRight> right)
+    //    {
+    //        if (right is TToAct valueToAct)
+    //        {
+    //            action(valueToAct);
+    //        }
+
+    //        return right;
+    //    }
+
+    //    Error HandleError(Error error)
+    //    {
+    //        if (error is TToAct valueToAct)
+    //        {
+    //            action(valueToAct);
+    //        }
+
+    //        return error;
+    //    }
+
+    //    var result = await task;
+    //    return result switch
+    //    {
+    //        Right<TRight> right => HandleValue(right),
+    //        Wrong<TRight> wrong => HandleError(wrong.Error),
+    //        _ => throw new InvalidOperationException("It cannot happen!"),
+    //    };
+    //}
 
 
     //public static Result<TRight> Swap<TRight, TToSwap>(this Func<Result<TRight>, Result<TRight>> func)
