@@ -146,49 +146,12 @@ public class IntegrationTests
         }
     }
 
-    public static IEnumerable<object[]> ReturnsUpperCase()
-    {
-        yield return new object[] { "abc", "ABC" };
-        yield return new object[] { "", new Error("Input value can't be empty") };
-    }
-
-    //static TheoryData<Result<Animal>, string> Data
-    //{
-    //    get
-    //    {
-    //        var data = new TheoryData<Result<Animal>, string>();
-    //        data.Add(new Dog("piesek"), "CAT IS PIESEK");
-    //        data.Add(new ThisParrotIsDeadError(), "CAT IS KOTEK");
-    //        return data;
-
-    //        //return new()
-    //        //{
-    //        //    { new Dog("piesek"), "CAT IS PIESEK" },
-    //        //    { new ThisParrotIsDeadError(), "CAT IS KOTEK" }
-    //        //};
-    //    }
-    //}
-
     public static TheoryData<Result<Animal>, string, string> Data =>
         new TheoryData<Result<Animal>, string, string>()
     {
         { new Dog("piesek"), "CAT IS PIESEK", string.Empty },
         { new ThisParrotIsDeadError(), "CAT IS KOTEK", ":(" }
     };
-
-    //[Fact]
-    //public void WhenValidData_FullFlowWorks()
-    //{
-    //    static Result<Animal> GetRandomPetFromOracle() => new Dog("piesek");
-
-    //    var result = GetRandomPetFromOracle()
-    //        .Act(e => Console.WriteLine(e))
-    //        .Swap<ThisParrotIsDeadError>(e => new Cat("kotek"))
-    //        .Swap<Dog>(d => new Cat(d.Name))
-    //        .Then(c => TestService.ToUpperCase($"{c.GetType().Name} is {c.Name}"));
-
-    //    result.Should().Be("CAT IS PIESEK");
-    //}
 
     [Theory, MemberData(nameof(Data))]
     public void Full_Flow_Works(Result<Animal> oracleResult, string expectedResult, string expectedError)
