@@ -35,8 +35,8 @@ public class HandleErrorsTests
 
         string errorMessage = string.Empty;
         Result<string> result = ReturnError()
-            .HandleError<Error1>(e => "replace error1")
-            .HandleError<Error2>(e => "replace error2")
+            .ThenError<Error1>(e => "replace error1")
+            .ThenError<Error2>(e => "replace error2")
             .Then(s => TestService.ToUpperCase(s));
 
         result.Should().Be("REPLACE ERROR1");
@@ -136,28 +136,71 @@ public class SwapTests
 public class IntegrationTests
 {
     // The stupidest class hierarchy possible
-    abstract class Animal(string name) { public string Name { get; init; } = name; }
-    sealed class Dog(string name) : Animal(name) { }
-    sealed class Cat(string name) : Animal(name) { }
-    sealed class AnimalNotFoundError : Error
+    public abstract class Animal(string name) { public string Name { get; init; } = name; }
+    public sealed class Dog(string name) : Animal(name) { }
+    public sealed class Cat(string name) : Animal(name) { }
+    public sealed class ThisParrotIsDeadError : Error
     {
-        public AnimalNotFoundError() : base(nameof(AnimalNotFoundError))
+        public ThisParrotIsDeadError() : base(":(")
         {
         }
     }
 
-    [Fact]
-    public void Full_Flow_Works()
+    public static IEnumerable<object[]> ReturnsUpperCase()
     {
-        static Result<Animal> GetPet() => new Dog("piesek");
+        yield return new object[] { "abc", "ABC" };
+        yield return new object[] { "", new Error("Input value can't be empty") };
+    }
 
-        var result = GetPet()
-            .ThenError(e => Console.WriteLine(e))
-            .HandleError<AnimalNotFoundError>(e => new Cat("kotek"))
+    //static TheoryData<Result<Animal>, string> Data
+    //{
+    //    get
+    //    {
+    //        var data = new TheoryData<Result<Animal>, string>();
+    //        data.Add(new Dog("piesek"), "CAT IS PIESEK");
+    //        data.Add(new ThisParrotIsDeadError(), "CAT IS KOTEK");
+    //        return data;
+
+    //        //return new()
+    //        //{
+    //        //    { new Dog("piesek"), "CAT IS PIESEK" },
+    //        //    { new ThisParrotIsDeadError(), "CAT IS KOTEK" }
+    //        //};
+    //    }
+    //}
+
+    public static IEnumerable<object[]> Data()
+    {
+        yield return new object[] { new Dog("piesek"), "CAT IS PIESEK" };
+        yield return new object[] { new ThisParrotIsDeadError(), "CAT IS KOTEK" };
+    }
+
+    [Fact]
+    public void WhenValidData_FullFlowWorks()
+    {
+        static Result<Animal> GetRandomPetFromOracle() => new Dog("piesek");
+
+        var result = GetRandomPetFromOracle()
+            .ActOnError(e => Console.WriteLine(e))
+            .Swap<ThisParrotIsDeadError>(e => new Cat("kotek"))
             .Swap<Dog>(d => new Cat(d.Name))
-            .Then(c => TestService.ToUpperCase($"{c.GetType().Name}: {c.Name}"));
+            .Then(c => TestService.ToUpperCase($"{c.GetType().Name} is {c.Name}"));
 
-        result.Should().Be("CAT: PIESEK");
+        result.Should().Be("CAT IS PIESEK");
+    }
+
+    [Theory, MemberData(nameof(Data))]
+    public void Full_Flow_Works(Result<Animal> oracleResult, string expectedValue)
+    {
+        Result<Animal> GetRandomPetFromOracle() => oracleResult;
+
+        var result = GetRandomPetFromOracle()
+            .ActOnError(e => Console.WriteLine(e))
+            .Swap<ThisParrotIsDeadError>(e => new Cat("kotek"))
+            .Swap<Dog>(d => new Cat(d.Name))
+            .Then(c => TestService.ToUpperCase($"{c.GetType().Name} is {c.Name}"));
+
+        result.Should().Be(expectedValue);
     }
 }
 

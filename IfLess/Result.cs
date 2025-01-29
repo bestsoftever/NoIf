@@ -14,7 +14,7 @@ public abstract class Result<TRight>
 
     // public abstract Result<TRight> Handle2<TInput>(Func<Result<TInput>, Result<TRight>> func);
 
-    public abstract Result<TRight> HandleError<TError>(Func<Error, Result<TRight>> func) where TError : Error;
+    public abstract Result<TRight> ThenError<TError>(Func<Error, Result<TRight>> func) where TError : Error;
 
     public static implicit operator Result<TRight>(Error error) => new Wrong<TRight>(error);
 
@@ -50,7 +50,7 @@ public sealed class Right<TRight> : Result<TRight>
     public override Result<TRight> Swap<TToSwap>(Func<TToSwap, Result<TRight>> func)
         where TToSwap : class
     {
-        return Value is not TToSwap valueToSwap ? Value : func(valueToSwap);
+        return Value is TToSwap valueToSwap ? func(valueToSwap) : Value;
     }
 
     // public override Result<TRight> Handle<TInput>(Func<Result<TInput>, Result<TRight>> func)
@@ -73,7 +73,7 @@ public sealed class Right<TRight> : Result<TRight>
         return RuntimeHelpers.GetHashCode(this);
     }
 
-    public override Result<TRight> HandleError<TError>(Func<Error, Result<TRight>> func)
+    public override Result<TRight> ThenError<TError>(Func<Error, Result<TRight>> func)
     {
         return this;
     }
@@ -125,7 +125,8 @@ internal sealed class Wrong<TRight> : Result<TRight>, IWrong
     public override Result<TRight> Swap<TToSwap>(Func<TToSwap, Result<TRight>> func)
          where TToSwap : class
     {
-        return Error;
+        return Error is TToSwap errorToSwap ? func(errorToSwap) : Error;
+        //return Error;
     }
 
     // public override Result<TRight> Handle<TInput>(Func<Result<TInput>, Result<TRight>> func)
@@ -153,7 +154,7 @@ internal sealed class Wrong<TRight> : Result<TRight>, IWrong
         return Error.GetHashCode();
     }
 
-    public override Result<TRight> HandleError<TError>(Func<Error, Result<TRight>> func)
+    public override Result<TRight> ThenError<TError>(Func<Error, Result<TRight>> func)
     {
         return typeof(TError) == this.Error.GetType() ? func(this.Error) : this;
     }
@@ -217,7 +218,7 @@ public static class ResultExtensions
     /// <param name="errorHandler"></param>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
-    public static Result<TRight> ThenError<TRight>(
+    public static Result<TRight> ActOnError<TRight>(
         this Result<TRight> result, Action<Error> errorHandler)
     {
         Error HandleError(Error error)
@@ -242,7 +243,7 @@ public static class ResultExtensions
     /// <param name="errorHandler"></param>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
-    public static async Task<Result<TRight>> ThenError<TRight>(
+    public static async Task<Result<TRight>> ActOnError<TRight>(
         this Task<Result<TRight>> task, Action<Error> errorHandler)
     {
         Error HandleError(Error error)
