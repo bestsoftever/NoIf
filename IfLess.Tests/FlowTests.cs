@@ -171,36 +171,38 @@ public class IntegrationTests
 
     public static IEnumerable<object[]> Data()
     {
-        yield return new object[] { new Dog("piesek"), "CAT IS PIESEK" };
-        yield return new object[] { new ThisParrotIsDeadError(), "CAT IS KOTEK" };
+        yield return new object[] { new Dog("piesek"), "CAT IS PIESEK", string.Empty };
+        yield return new object[] { new ThisParrotIsDeadError(), "CAT IS KOTEK", ":(" };
     }
 
-    [Fact]
-    public void WhenValidData_FullFlowWorks()
-    {
-        static Result<Animal> GetRandomPetFromOracle() => new Dog("piesek");
+    //[Fact]
+    //public void WhenValidData_FullFlowWorks()
+    //{
+    //    static Result<Animal> GetRandomPetFromOracle() => new Dog("piesek");
 
-        var result = GetRandomPetFromOracle()
-            .ActOnError(e => Console.WriteLine(e))
-            .Swap<ThisParrotIsDeadError>(e => new Cat("kotek"))
-            .Swap<Dog>(d => new Cat(d.Name))
-            .Then(c => TestService.ToUpperCase($"{c.GetType().Name} is {c.Name}"));
+    //    var result = GetRandomPetFromOracle()
+    //        .Act(e => Console.WriteLine(e))
+    //        .Swap<ThisParrotIsDeadError>(e => new Cat("kotek"))
+    //        .Swap<Dog>(d => new Cat(d.Name))
+    //        .Then(c => TestService.ToUpperCase($"{c.GetType().Name} is {c.Name}"));
 
-        result.Should().Be("CAT IS PIESEK");
-    }
+    //    result.Should().Be("CAT IS PIESEK");
+    //}
 
     [Theory, MemberData(nameof(Data))]
-    public void Full_Flow_Works(Result<Animal> oracleResult, string expectedValue)
+    public void Full_Flow_Works(Result<Animal> oracleResult, string expectedResult, string expectedError)
     {
         Result<Animal> GetRandomPetFromOracle() => oracleResult;
+        string errorMessage = string.Empty;
 
         var result = GetRandomPetFromOracle()
-            .ActOnError(e => Console.WriteLine(e))
+            .Act<Error>(e => errorMessage = e.Message)
             .Swap<ThisParrotIsDeadError>(e => new Cat("kotek"))
             .Swap<Dog>(d => new Cat(d.Name))
             .Then(c => TestService.ToUpperCase($"{c.GetType().Name} is {c.Name}"));
 
-        result.Should().Be(expectedValue);
+        result.Should().Be(expectedResult);
+        errorMessage.Should().Be(expectedError);
     }
 }
 

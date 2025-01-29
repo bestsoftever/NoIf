@@ -10,6 +10,8 @@ public abstract class Result<TRight>
 
     public abstract Result<TRight> Swap<TToSwap>(Func<TToSwap, Result<TRight>> func) where TToSwap : class;
 
+    public abstract Result<TRight> Act<TToAct>(Action<TToAct> action) where TToAct : class;
+
     // public abstract Result<TRight> Handle<TInput>(Func<Result<TInput>, Result<TRight>> func);
 
     // public abstract Result<TRight> Handle2<TInput>(Func<Result<TInput>, Result<TRight>> func);
@@ -52,6 +54,32 @@ public sealed class Right<TRight> : Result<TRight>
     {
         return Value is TToSwap valueToSwap ? func(valueToSwap) : Value;
     }
+
+    public override Result<TRight> Act<TToAct>(Action<TToAct> action)
+    {
+        if (Value is TToAct valueToAct)
+        {
+            action(valueToAct);
+        }
+
+        return Value;
+    }
+
+    //public Result<TRight> Act<TToAct>(Action<Result<TRight>> func) where TToAct : class;
+    //    {
+    //        Error HandleError(Error error)
+    //{
+    //    errorHandler(error);
+    //    return error;
+    //}
+
+    //        return result switch
+    //        {
+    //            Right<TRight> right => right,
+    //            Wrong<TRight> wrong => HandleError(wrong.Error),
+    //            _ => throw new InvalidOperationException("It cannot happen!"),
+    //        };
+    //    }
 
     // public override Result<TRight> Handle<TInput>(Func<Result<TInput>, Result<TRight>> func)
     // {
@@ -126,7 +154,16 @@ internal sealed class Wrong<TRight> : Result<TRight>, IWrong
          where TToSwap : class
     {
         return Error is TToSwap errorToSwap ? func(errorToSwap) : Error;
-        //return Error;
+    }
+
+    public override Result<TRight> Act<TToAct>(Action<TToAct> action)
+    {
+        if (Error is TToAct valueToAct)
+        {
+            action(valueToAct);
+        }
+
+        return Error;
     }
 
     // public override Result<TRight> Handle<TInput>(Func<Result<TInput>, Result<TRight>> func)
@@ -235,6 +272,23 @@ public static class ResultExtensions
         };
     }
 
+    //public static Result<TRight> Act<TRight>(
+    //   this Result<TRight> result, Action<Result<TRight>> func)
+    //{
+    //    Error HandleError(Error error)
+    //    {
+    //        errorHandler(error);
+    //        return error;
+    //    }
+
+    //    return result switch
+    //    {
+    //        Right<TRight> right => right,
+    //        Wrong<TRight> wrong => HandleError(wrong.Error),
+    //        _ => throw new InvalidOperationException("It cannot happen!"),
+    //    };
+    //}
+
     /// <summary>
     /// Invokes an action when Result is an error and passes the Result.
     /// </summary>
@@ -260,6 +314,7 @@ public static class ResultExtensions
             _ => throw new InvalidOperationException("It cannot happen!"),
         };
     }
+
 
     //public static Result<TRight> Swap<TRight, TToSwap>(this Func<Result<TRight>, Result<TRight>> func)
     //{
