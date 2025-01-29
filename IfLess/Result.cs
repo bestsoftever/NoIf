@@ -14,7 +14,7 @@ public abstract class Result<TRight>
 
     // public abstract Result<TRight> Handle2<TInput>(Func<Result<TInput>, Result<TRight>> func);
 
-    public abstract Result<TRight> ThenError<TError>(Func<Error, Result<TRight>> func) where TError : Error;
+    //public abstract Result<TRight> ThenError<TError>(Func<Error, Result<TRight>> func) where TError : Error;
 
     public static implicit operator Result<TRight>(Error error) => new Wrong<TRight>(error);
 
@@ -73,10 +73,10 @@ public sealed class Right<TRight> : Result<TRight>
         return RuntimeHelpers.GetHashCode(this);
     }
 
-    public override Result<TRight> ThenError<TError>(Func<Error, Result<TRight>> func)
-    {
-        return this;
-    }
+    //public override Result<TRight> ThenError<TError>(Func<Error, Result<TRight>> func)
+    //{
+    //    return this;
+    //}
 }
 
 public sealed class None
@@ -154,10 +154,10 @@ internal sealed class Wrong<TRight> : Result<TRight>, IWrong
         return Error.GetHashCode();
     }
 
-    public override Result<TRight> ThenError<TError>(Func<Error, Result<TRight>> func)
-    {
-        return typeof(TError) == this.Error.GetType() ? func(this.Error) : this;
-    }
+    //public override Result<TRight> ThenError<TError>(Func<Error, Result<TRight>> func)
+    //{
+    //    return typeof(TError) == this.Error.GetType() ? func(this.Error) : this;
+    //}
 }
 
 /// <summary>

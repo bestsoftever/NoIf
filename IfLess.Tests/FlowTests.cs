@@ -35,8 +35,8 @@ public class HandleErrorsTests
 
         string errorMessage = string.Empty;
         Result<string> result = ReturnError()
-            .ThenError<Error1>(e => "replace error1")
-            .ThenError<Error2>(e => "replace error2")
+            .Swap<Error1>(e => "replace error1")
+            .Swap<Error2>(e => "replace error2")
             .Then(s => TestService.ToUpperCase(s));
 
         result.Should().Be("REPLACE ERROR1");
