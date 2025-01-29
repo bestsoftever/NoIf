@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 
 namespace IfLess;
 
@@ -9,7 +8,7 @@ public abstract class Result<TRight>
 
     public abstract Task<Result<TOutput>> Then<TOutput>(Func<TRight, Task<Result<TOutput>>> func);
 
-    public abstract Result<TRight> Swap<TToSwap>(Func<Result<TRight>, Result<TRight>> func);
+    public abstract Result<TRight> Swap<TToSwap>(Func<TToSwap, Result<TRight>> func) where TToSwap : class;
 
     // public abstract Result<TRight> Handle<TInput>(Func<Result<TInput>, Result<TRight>> func);
 
@@ -48,9 +47,10 @@ public sealed class Right<TRight> : Result<TRight>
         return await func(Value);
     }
 
-    public override Result<TRight> Swap<TToSwap>(Func<Result<TRight>, Result<TRight>> func)
+    public override Result<TRight> Swap<TToSwap>(Func<TToSwap, Result<TRight>> func)
+        where TToSwap : class
     {
-        return Value!.GetType() == typeof(TToSwap) ? func(Value) : Value;
+        return Value is not TToSwap valueToSwap ? Value : func(valueToSwap);
     }
 
     // public override Result<TRight> Handle<TInput>(Func<Result<TInput>, Result<TRight>> func)
@@ -122,9 +122,10 @@ internal sealed class Wrong<TRight> : Result<TRight>, IWrong
         return await Task.FromResult(Error);
     }
 
-    public override Result<TRight> Swap<TToSwap>(Func<Result<TRight>, Result<TRight>> func)
+    public override Result<TRight> Swap<TToSwap>(Func<TToSwap, Result<TRight>> func)
+         where TToSwap : class
     {
-        return Error!.GetType() == typeof(TToSwap) ? func(Error) : Error;
+        return Error;
     }
 
     // public override Result<TRight> Handle<TInput>(Func<Result<TInput>, Result<TRight>> func)

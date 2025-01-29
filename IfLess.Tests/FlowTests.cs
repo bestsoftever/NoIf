@@ -1,15 +1,9 @@
+using Xunit.Sdk;
 
 namespace IfLess.Tests;
 
 public class HandleErrorsTests
 {
-    // class NotAnError : Error
-    // {
-    //     public NotAnError() : base("Not really an error")
-    //     {
-    //     }
-    // }
-
     class Error1 : Error
     {
         public Error1() : base("Error 1")
@@ -41,15 +35,13 @@ public class HandleErrorsTests
 
         string errorMessage = string.Empty;
         Result<string> result = ReturnError()
-            .HandleError<Error1>(e => errorMessage = $"error1: {e.Message}")
-            .HandleError<Error2>(e => errorMessage = $"error2: {e.Message}")
+            .HandleError<Error1>(e => "replace error1")
+            .HandleError<Error2>(e => "replace error2")
             .Then(s => TestService.ToUpperCase(s));
 
-        errorMessage.Should().Be("error1: Error 1");
-        result.Should().Be("SOMETHING ELSE");
+        result.Should().Be("REPLACE ERROR1");
     }
 }
-
 
 
 public class SwapTests
@@ -147,20 +139,30 @@ public class IntegrationTests
     abstract class Animal(string name) { public string Name { get; init; } = name; }
     sealed class Dog(string name) : Animal(name) { }
     sealed class Cat(string name) : Animal(name) { }
+    sealed class AnimalNotFoundError : Error
+    {
+        public AnimalNotFoundError() : base(nameof(AnimalNotFoundError))
+        {
+        }
+    }
 
     [Fact]
-    public void Flow_Works()
+    public void Full_Flow_Works()
     {
-        static Result<Animal> GetPet() => new Dog("ziomek");
+        static Result<Animal> GetPet() => new Dog("piesek");
 
         var result = GetPet()
             .ThenError(e => Console.WriteLine(e))
-            //.Swap<Dog>(d => new Cat(d.Name))
-            .Then(c => TestService.ToUpperCase(c.GetType().Name));
+            .HandleError<AnimalNotFoundError>(e => new Cat("kotek"))
+            .Swap<Dog>(d => new Cat(d.Name))
+            .Then(c => TestService.ToUpperCase($"{c.GetType().Name}: {c.Name}"));
 
-        result.Should().Be("CAT");
+        result.Should().Be("CAT: PIESEK");
     }
+}
 
+public class NestedThenTests
+{
     [Fact]
     public void NestedFlow_Works()
     {
