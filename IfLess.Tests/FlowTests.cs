@@ -169,11 +169,12 @@ public class IntegrationTests
     //    }
     //}
 
-    public static IEnumerable<object[]> Data()
+    public static TheoryData<Result<Animal>, string, string> Data =>
+        new TheoryData<Result<Animal>, string, string>()
     {
-        yield return new object[] { new Dog("piesek"), "CAT IS PIESEK", string.Empty };
-        yield return new object[] { new ThisParrotIsDeadError(), "CAT IS KOTEK", ":(" };
-    }
+        { new Dog("piesek"), "CAT IS PIESEK", string.Empty },
+        { new ThisParrotIsDeadError(), "CAT IS KOTEK", ":(" }
+    };
 
     //[Fact]
     //public void WhenValidData_FullFlowWorks()
