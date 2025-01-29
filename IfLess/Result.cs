@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using static System.Collections.Specialized.BitVector32;
 
 namespace IfLess;
 
@@ -278,6 +279,46 @@ public static class ResultExtensions
     {
         return (await task).Act(action);
     }
+
+    ///// <summary>
+    ///// Invokes an action when Result is an error and passes the Result.
+    ///// </summary>
+    ///// <typeparam name="TRight"></typeparam>
+    ///// <param name="result"></param>
+    ///// <param name="errorHandler"></param>
+    ///// <returns></returns>
+    ///// <exception cref="InvalidOperationException"></exception>
+    //public static Result<TRight> ActOnError<TRight>(this Result<TRight> result, Action<Error> errorHandler)
+    //{
+    //    Error HandleError(Error error)
+    //    {
+    //        errorHandler(error);
+    //        return error;
+    //    }
+
+    //    return result switch
+    //    {
+    //        Right<TRight> right => right,
+    //        Wrong<TRight> wrong => HandleError(wrong.Error),
+    //        _ => throw new InvalidOperationException("It cannot happen!"),
+    //    };
+    //}
+
+    //public static Result<TRight> ActOnError<TRight>(this Result<TRight> result, Action<Error> errorHandler)
+    //{
+    //    return (await task).Act<Error>(action);
+    //}
+
+    public static Result<TRight> ActOnError<TRight>(this Result<TRight> result, Action<Error> errorHandler)
+    {
+        return result.Act(errorHandler);
+    }
+
+    public static Task<Result<TRight>> ActOnError<TRight>(this Task<Result<TRight>> task, Action<Error> errorHandler)
+    {
+        return task.Act(errorHandler);
+    }
+
 
     ///// <summary>
     ///// Invokes an action when Result is an error and passes the Result.
