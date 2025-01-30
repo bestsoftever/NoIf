@@ -11,9 +11,11 @@ public abstract class Result<TRight>
 
     public abstract Task<Result<TOutput>> Then<TOutput>(Func<TRight, Task<Result<TOutput>>> func);
 
-    public abstract Result<TRight> Swap<TToSwap>(Func<TToSwap, Result<TRight>> func) where TToSwap : class;
+    public abstract Result<TRight> Swap<TToSwap>(Func<TToSwap, Result<TRight>> func);
 
-    public abstract Result<TRight> Act<TToAct>(Action<TToAct> action) where TToAct : class;
+    public abstract Task<Result<TRight>> Swap<TToSwap>(Func<TToSwap, Task<Result<TRight>>> func);
+
+    public abstract Result<TRight> Act<TToAct>(Action<TToAct> action);
 
     //public abstract Task<Result<TRight>> ActAsync<TToAct>(Action<TToAct> action) where TToAct : class;
     //{
@@ -58,9 +60,13 @@ public sealed class Right<TRight> : Result<TRight>
     }
 
     public override Result<TRight> Swap<TToSwap>(Func<TToSwap, Result<TRight>> func)
-        where TToSwap : class
     {
         return Value is TToSwap valueToSwap ? func(valueToSwap) : Value;
+    }
+
+    public override async Task<Result<TRight>> Swap<TToSwap>(Func<TToSwap, Task<Result<TRight>>> func)
+    {
+        return Value is TToSwap valueToSwap ? await func(valueToSwap) : Value;
     }
 
     public override Result<TRight> Act<TToAct>(Action<TToAct> action)
@@ -108,6 +114,8 @@ public sealed class Right<TRight> : Result<TRight>
     {
         return RuntimeHelpers.GetHashCode(this);
     }
+
+
 
     //public override Task<Result<TRight>> ActAsync<TToAct>(Action<TToAct> action)
     //{
@@ -164,9 +172,13 @@ internal sealed class Wrong<TRight> : Result<TRight>, IWrong
     }
 
     public override Result<TRight> Swap<TToSwap>(Func<TToSwap, Result<TRight>> func)
-         where TToSwap : class
     {
         return Error is TToSwap errorToSwap ? func(errorToSwap) : Error;
+    }
+
+    public override async Task<Result<TRight>> Swap<TToSwap>(Func<TToSwap, Task<Result<TRight>>> func)
+    {
+        return Error is TToSwap errorToSwap ? await func(errorToSwap) : Error;
     }
 
     public override Result<TRight> Act<TToAct>(Action<TToAct> action)
@@ -269,13 +281,13 @@ public static class ResultExtensions
 
 
     public static async Task<Result<TRight>> Act<TRight, TToAct>(this Task<Result<TRight>> task, Action<TToAct> action)
-        where TToAct : class
+        //where TToAct : class
     {
         return (await task).Act(action);
     }
 
     public static async Task<Result<TRight>> Act<TRight, TToAct>(this Task<Result<TRight>> task, Action<Task<TToAct>> action)
-        where TToAct : class
+        //where TToAct : class
     {
         return (await task).Act(action);
     }
@@ -317,6 +329,19 @@ public static class ResultExtensions
     public static Task<Result<TRight>> ActOnError<TRight>(this Task<Result<TRight>> task, Action<Error> errorHandler)
     {
         return task.Act(errorHandler);
+    }
+
+
+    //public override Result<TRight> Swap<TToSwap>(Func<TToSwap, Result<TRight>> func)
+
+    public static async Task<Result<TRight>> Swap<TRight, TToSwap>(this Task<Result<TRight>> task, Func<TToSwap, Result<TRight>> func)
+    {
+        return (await task).Swap(func);
+    }
+
+    public static async Task<Result<TRight>> Swap<TRight, TToSwap>(this Task<Result<TRight>> task, Func<TToSwap, Task<Result<TRight>>> func)
+    {
+        return await (await task).Swap(func);
     }
 
 

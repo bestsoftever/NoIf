@@ -2,6 +2,7 @@ using Xunit.Sdk;
 
 namespace IfLess.Tests;
 
+// TODO: probably can be removed
 public class HandleErrorsTests
 {
     class Error1 : Error
@@ -43,7 +44,7 @@ public class HandleErrorsTests
     }
 }
 
-
+// TODO: probably remove error test cases, leave only swaping a valid data
 public class SwapTests
 {
     class NotAnError : Error
@@ -356,7 +357,7 @@ public class ThenTests
     }
 }
 
-public class NoneTests
+public class NoneEqualityTests
 {
     [Fact]
     public void NoneIsNone()
@@ -365,7 +366,7 @@ public class NoneTests
     }
 }
 
-public class ErrorTests
+public class ErrorEqualityTests
 {
     [Fact]
     public void SimpleErrorWorks()
