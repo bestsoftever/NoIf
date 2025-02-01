@@ -1,6 +1,6 @@
 using Xunit.Sdk;
 
-namespace IfLess.Tests;
+namespace NoIf.Tests;
 
 // TODO: probably can be removed
 public class HandleErrorsTests

@@ -1,4 +1,4 @@
-namespace IfLess.Tests;
+namespace NoIf.Tests;
 
 public class ActErrorTests
 {

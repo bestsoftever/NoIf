@@ -1,6 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 
-namespace IfLess;
+namespace NoIf;
 
 public abstract class Result<TRight>
 {
