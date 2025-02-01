@@ -1,4 +1,4 @@
-namespace IfLess.Tests;
+namespace NoIf.Tests;
 
 public class SwapErrorsTests
 {
@@ -28,7 +28,7 @@ public class SwapErrorsTests
         Result<string> result = await TestService.ReverseString("abc")
             .Swap<Error>(e => e.Message)
             .Then(s => TestService.ToUpperCaseAsync(s));
-       
+
         result.Should().Be("CBA");
     }
 
@@ -38,7 +38,7 @@ public class SwapErrorsTests
         Result<string> result = await TestService.ReverseString("    ")
             .Swap<Error>(e => e.Message)
             .Then(s => TestService.ToUpperCaseAsync(s));
-        
+
         result.Should().Be("INPUT VALUE CAN'T BE EMPTY");
     }
 
@@ -48,7 +48,7 @@ public class SwapErrorsTests
         Result<None> result = TestService.ReverseString("abc")
             .Swap<Error>(e => e.Message)
             .Then(s => TestService.DoNothing(s));
-       
+
         result.Should().Be(Result.None);
     }
 
@@ -58,7 +58,7 @@ public class SwapErrorsTests
         Result<None> result = TestService.ReverseString("    ")
             .Swap<Error>(e => e.Message)
             .Then(s => TestService.DoNothing(s));
-        
+
         result.Should().Be(Result.None);
     }
 
@@ -68,7 +68,7 @@ public class SwapErrorsTests
         Result<None> result = await TestService.ReverseString("abc")
             .Swap<Error>(e => e.Message)
             .Then(s => TestService.DoNothingAsync(s));
-       
+
         result.Should().Be(Result.None);
     }
 
@@ -78,7 +78,7 @@ public class SwapErrorsTests
         Result<None> result = await TestService.ReverseString("    ")
             .Swap<Error>(e => e.Message)
             .Then(s => TestService.DoNothingAsync(s));
-        
+
         result.Should().Be(Result.None);
     }
 
@@ -89,7 +89,7 @@ public class SwapErrorsTests
         Result<string> result = await TestService.ReverseStringAsync("abc")
             .Swap<string, Error>(e => e.Message)
             .Then(s => TestService.ToUpperCase(s));
-       
+
         result.Should().Be("CBA");
     }
 
@@ -99,7 +99,7 @@ public class SwapErrorsTests
         Result<string> result = await TestService.ReverseStringAsync("    ")
             .Swap<string, Error>(e => e.Message)
             .Then(s => TestService.ToUpperCase(s));
-        
+
         result.Should().Be("INPUT VALUE CAN'T BE EMPTY");
     }
 
@@ -129,7 +129,7 @@ public class SwapErrorsTests
         Result<None> result = await TestService.ReverseStringAsync("abc")
             .Swap<string, Error>(e => e.Message)
             .Then(s => TestService.DoNothing(s));
-       
+
         result.Should().Be(Result.None);
     }
 
@@ -159,7 +159,7 @@ public class SwapErrorsTests
         Result<None> result = await TestService.ReverseStringAsync("    ")
             .Swap<string, Error>(e => e.Message)
             .Then(s => TestService.DoNothingAsync(s));
-        
+
         result.Should().Be(Result.None);
     }
 
@@ -182,7 +182,7 @@ public class SwapErrorsTests
         Result<string> result = TestService.DoNothing("    ")
             .Swap<Error>(e => Result.None)
             .Then(_ => TestService.ToUpperCase(s));
-        
+
         result.Should().Be("CBA");
     }
 
@@ -193,7 +193,7 @@ public class SwapErrorsTests
         Result<string> result = await TestService.DoNothing("abc")
             .Swap<Error>(e => Result.None)
             .Then(_ => TestService.ToUpperCaseAsync(s));
-       
+
         result.Should().Be("CBA");
     }
 
@@ -215,7 +215,7 @@ public class SwapErrorsTests
         Result<None> result = TestService.DoNothing("abc")
             .Swap<Error>(e => Result.None)
             .Then(_ => TestService.DoNothing(s));
-       
+
         result.Should().Be(Result.None);
     }
 
@@ -226,7 +226,7 @@ public class SwapErrorsTests
         Result<None> result = TestService.DoNothing("    ")
             .Swap<Error>(e => Result.None)
             .Then(_ => TestService.DoNothing(s));
-        
+
         result.Should().Be(Result.None);
     }
 
@@ -259,7 +259,7 @@ public class SwapErrorsTests
         Result<string> result = await TestService.DoNothingAsync("abc")
             .Swap<None, Error>(e => Result.None)
             .Then(_ => TestService.ToUpperCase(s));
-       
+
         result.Should().Be("CBA");
     }
 
@@ -281,7 +281,7 @@ public class SwapErrorsTests
         Result<string> result = await TestService.DoNothingAsync("abc")
             .Swap<None, Error>(e => Result.None)
             .Then(_ => TestService.ToUpperCaseAsync(s));
-       
+
         result.Should().Be("CBA");
     }
 
@@ -292,7 +292,7 @@ public class SwapErrorsTests
         Result<string> result = await TestService.DoNothingAsync("    ")
             .Swap<None, Error>(e => Result.None)
             .Then(_ => TestService.ToUpperCaseAsync(s));
-        
+
         result.Should().Be("CBA");
     }
 
@@ -314,7 +314,7 @@ public class SwapErrorsTests
         Result<None> result = await TestService.DoNothingAsync("    ")
             .Swap<None, Error>(e => Result.None)
             .Then(_ => TestService.DoNothing(s));
-        
+
         result.Should().Be(Result.None);
     }
 
@@ -326,7 +326,7 @@ public class SwapErrorsTests
             .Swap<None, Error>(e => Result.None)
             .Then(_ => TestService.DoNothingAsync(s));
 
-       
+
         result.Should().Be(Result.None);
     }
 
@@ -337,7 +337,7 @@ public class SwapErrorsTests
         Result<None> result = await TestService.DoNothingAsync("    ")
             .Swap<None, Error>(e => Result.None)
             .Then(_ => TestService.DoNothingAsync(s));
-        
+
         result.Should().Be(Result.None);
     }
 }

@@ -1,13 +1,13 @@
-namespace IfLess.Tests;
+namespace NoIf.Tests;
 
-public class ActOnErrorTests
+public class ActErrorTests
 {
     [Fact]
     public void SyncToSync_Valid()
     {
         string errorMessage = string.Empty;
         Result<string> result = TestService.ReverseString("abc")
-            .ActOnError(e => errorMessage = $"message logged: {e.Message}")
+            .Act<Error>(e => errorMessage = $"message logged: {e.Message}")
             .Then(s => TestService.ToUpperCase(s));
 
         errorMessage.Should().BeEmpty();
@@ -19,11 +19,11 @@ public class ActOnErrorTests
     {
         string errorMessage = string.Empty;
         Result<string> result = TestService.ReverseString("    ")
-            .ActOnError(e => errorMessage = $"message logged: {e.Message}")
+            .Act<Error>(e => errorMessage = $"message logged: {e.Message}")
             .Then(s => TestService.ToUpperCase(s));
 
         errorMessage.Should().Be("message logged: Input value can't be empty");
-        result.Should().Be(new Error("Input value can't be empty"));
+        result.Should().Be(new Error(TestService.ErrorMessage));
     }
 
     [Fact]
@@ -31,7 +31,7 @@ public class ActOnErrorTests
     {
         string errorMessage = string.Empty;
         Result<string> result = await TestService.ReverseString("abc")
-            .ActOnError(e => errorMessage = $"message logged: {e.Message}")
+            .Act<Error>(e => errorMessage = $"message logged: {e.Message}")
             .Then(s => TestService.ToUpperCaseAsync(s));
 
         errorMessage.Should().BeEmpty();
@@ -43,11 +43,11 @@ public class ActOnErrorTests
     {
         string errorMessage = string.Empty;
         Result<string> result = await TestService.ReverseString("    ")
-            .ActOnError(e => errorMessage = $"message logged: {e.Message}")
+            .Act<Error>(e => errorMessage = $"message logged: {e.Message}")
             .Then(s => TestService.ToUpperCaseAsync(s));
 
         errorMessage.Should().Be("message logged: Input value can't be empty");
-        result.Should().Be(new Error("Input value can't be empty"));
+        result.Should().Be(new Error(TestService.ErrorMessage));
     }
 
     [Fact]
@@ -55,7 +55,7 @@ public class ActOnErrorTests
     {
         string errorMessage = string.Empty;
         Result<None> result = TestService.ReverseString("abc")
-            .ActOnError(e => errorMessage = $"message logged: {e.Message}")
+            .Act<Error>(e => errorMessage = $"message logged: {e.Message}")
             .Then(s => TestService.DoNothing(s));
 
         errorMessage.Should().BeEmpty();
@@ -67,11 +67,11 @@ public class ActOnErrorTests
     {
         string errorMessage = string.Empty;
         Result<None> result = TestService.ReverseString("    ")
-            .ActOnError(e => errorMessage = $"message logged: {e.Message}")
+            .Act<Error>(e => errorMessage = $"message logged: {e.Message}")
             .Then(s => TestService.DoNothing(s));
 
         errorMessage.Should().Be("message logged: Input value can't be empty");
-        result.Should().Be(new Error("Input value can't be empty"));
+        result.Should().Be(new Error(TestService.ErrorMessage));
     }
 
     [Fact]
@@ -79,7 +79,7 @@ public class ActOnErrorTests
     {
         string errorMessage = string.Empty;
         Result<None> result = await TestService.ReverseString("abc")
-            .ActOnError(e => errorMessage = $"message logged: {e.Message}")
+            .Act<Error>(e => errorMessage = $"message logged: {e.Message}")
             .Then(s => TestService.DoNothingAsync(s));
 
         errorMessage.Should().BeEmpty();
@@ -91,11 +91,11 @@ public class ActOnErrorTests
     {
         string errorMessage = string.Empty;
         Result<None> result = await TestService.ReverseString("    ")
-            .ActOnError(e => errorMessage = $"message logged: {e.Message}")
+            .Act<Error>(e => errorMessage = $"message logged: {e.Message}")
             .Then(s => TestService.DoNothingAsync(s));
 
         errorMessage.Should().Be("message logged: Input value can't be empty");
-        result.Should().Be(new Error("Input value can't be empty"));
+        result.Should().Be(new Error(TestService.ErrorMessage));
     }
 
 
@@ -104,7 +104,7 @@ public class ActOnErrorTests
     {
         string errorMessage = string.Empty;
         Result<string> result = await TestService.ReverseStringAsync("abc")
-            .ActOnError(e => errorMessage = $"message logged: {e.Message}")
+            .Act<string, Error>(e => errorMessage = $"message logged: {e.Message}")
             .Then(s => TestService.ToUpperCase(s));
 
         errorMessage.Should().BeEmpty();
@@ -116,11 +116,11 @@ public class ActOnErrorTests
     {
         string errorMessage = string.Empty;
         Result<string> result = await TestService.ReverseStringAsync("    ")
-            .ActOnError(e => errorMessage = $"message logged: {e.Message}")
+            .Act<string, Error>(e => errorMessage = $"message logged: {e.Message}")
             .Then(s => TestService.ToUpperCase(s));
 
         errorMessage.Should().Be("message logged: Input value can't be empty");
-        result.Should().Be(new Error("Input value can't be empty"));
+        result.Should().Be(new Error(TestService.ErrorMessage));
     }
 
     [Fact]
@@ -128,7 +128,7 @@ public class ActOnErrorTests
     {
         string errorMessage = string.Empty;
         Result<string> result = await TestService.ReverseStringAsync("abc")
-            .ActOnError(e => errorMessage = $"message logged: {e.Message}")
+            .Act<string, Error>(e => errorMessage = $"message logged: {e.Message}")
             .Then(s => TestService.ToUpperCaseAsync(s));
 
         errorMessage.Should().BeEmpty();
@@ -140,11 +140,11 @@ public class ActOnErrorTests
     {
         string errorMessage = string.Empty;
         Result<string> result = await TestService.ReverseStringAsync("    ")
-            .ActOnError(e => errorMessage = $"message logged: {e.Message}")
+            .Act<string, Error>(e => errorMessage = $"message logged: {e.Message}")
             .Then(s => TestService.ToUpperCaseAsync(s));
 
         errorMessage.Should().Be("message logged: Input value can't be empty");
-        result.Should().Be(new Error("Input value can't be empty"));
+        result.Should().Be(new Error(TestService.ErrorMessage));
     }
 
     [Fact]
@@ -152,7 +152,7 @@ public class ActOnErrorTests
     {
         string errorMessage = string.Empty;
         Result<None> result = await TestService.ReverseStringAsync("abc")
-            .ActOnError(e => errorMessage = $"message logged: {e.Message}")
+            .Act<string, Error>(e => errorMessage = $"message logged: {e.Message}")
             .Then(s => TestService.DoNothing(s));
 
         errorMessage.Should().BeEmpty();
@@ -164,11 +164,11 @@ public class ActOnErrorTests
     {
         string errorMessage = string.Empty;
         Result<None> result = await TestService.ReverseStringAsync("    ")
-            .ActOnError(e => errorMessage = $"message logged: {e.Message}")
+            .Act<string, Error>(e => errorMessage = $"message logged: {e.Message}")
             .Then(s => TestService.DoNothing(s));
 
         errorMessage.Should().Be("message logged: Input value can't be empty");
-        result.Should().Be(new Error("Input value can't be empty"));
+        result.Should().Be(new Error(TestService.ErrorMessage));
     }
 
     [Fact]
@@ -176,7 +176,7 @@ public class ActOnErrorTests
     {
         string errorMessage = string.Empty;
         Result<None> result = await TestService.ReverseStringAsync("abc")
-            .ActOnError(e => errorMessage = $"message logged: {e.Message}")
+            .Act<string, Error>(e => errorMessage = $"message logged: {e.Message}")
             .Then(s => TestService.DoNothingAsync(s));
 
         errorMessage.Should().BeEmpty();
@@ -188,11 +188,11 @@ public class ActOnErrorTests
     {
         string errorMessage = string.Empty;
         Result<None> result = await TestService.ReverseStringAsync("    ")
-            .ActOnError(e => errorMessage = $"message logged: {e.Message}")
+            .Act<string, Error>(e => errorMessage = $"message logged: {e.Message}")
             .Then(s => TestService.DoNothingAsync(s));
 
         errorMessage.Should().Be("message logged: Input value can't be empty");
-        result.Should().Be(new Error("Input value can't be empty"));
+        result.Should().Be(new Error(TestService.ErrorMessage));
     }
 
 
@@ -202,7 +202,7 @@ public class ActOnErrorTests
         string errorMessage = string.Empty;
         string s = "cba";
         Result<string> result = TestService.DoNothing("abc")
-            .ActOnError(e => errorMessage = $"message logged: {e.Message}")
+            .Act<Error>(e => errorMessage = $"message logged: {e.Message}")
             .Then(_ => TestService.ToUpperCase(s));
 
         errorMessage.Should().BeEmpty();
@@ -215,11 +215,11 @@ public class ActOnErrorTests
         string errorMessage = string.Empty;
         string s = "cba";
         Result<string> result = TestService.DoNothing("    ")
-            .ActOnError(e => errorMessage = $"message logged: {e.Message}")
+            .Act<Error>(e => errorMessage = $"message logged: {e.Message}")
             .Then(_ => TestService.ToUpperCase(s));
 
         errorMessage.Should().Be("message logged: Input value can't be empty");
-        result.Should().Be(new Error("Input value can't be empty"));
+        result.Should().Be(new Error(TestService.ErrorMessage));
     }
 
     [Fact]
@@ -228,7 +228,7 @@ public class ActOnErrorTests
         string errorMessage = string.Empty;
         string s = "cba";
         Result<string> result = await TestService.DoNothing("abc")
-            .ActOnError(e => errorMessage = $"message logged: {e.Message}")
+            .Act<Error>(e => errorMessage = $"message logged: {e.Message}")
             .Then(_ => TestService.ToUpperCaseAsync(s));
 
         errorMessage.Should().BeEmpty();
@@ -241,11 +241,11 @@ public class ActOnErrorTests
         string errorMessage = string.Empty;
         string s = "cba";
         Result<string> result = await TestService.DoNothing("    ")
-            .ActOnError(e => errorMessage = $"message logged: {e.Message}")
+            .Act<Error>(e => errorMessage = $"message logged: {e.Message}")
             .Then(_ => TestService.ToUpperCaseAsync(s));
 
         errorMessage.Should().Be("message logged: Input value can't be empty");
-        result.Should().Be(new Error("Input value can't be empty"));
+        result.Should().Be(new Error(TestService.ErrorMessage));
     }
 
     [Fact]
@@ -254,7 +254,7 @@ public class ActOnErrorTests
         string errorMessage = string.Empty;
         string s = "cba";
         Result<None> result = TestService.DoNothing("abc")
-            .ActOnError(e => errorMessage = $"message logged: {e.Message}")
+            .Act<Error>(e => errorMessage = $"message logged: {e.Message}")
             .Then(_ => TestService.DoNothing(s));
 
         errorMessage.Should().BeEmpty();
@@ -267,11 +267,11 @@ public class ActOnErrorTests
         string errorMessage = string.Empty;
         string s = "cba";
         Result<None> result = TestService.DoNothing("    ")
-            .ActOnError(e => errorMessage = $"message logged: {e.Message}")
+            .Act<Error>(e => errorMessage = $"message logged: {e.Message}")
             .Then(_ => TestService.DoNothing(s));
 
         errorMessage.Should().Be("message logged: Input value can't be empty");
-        result.Should().Be(new Error("Input value can't be empty"));
+        result.Should().Be(new Error(TestService.ErrorMessage));
     }
 
     [Fact]
@@ -280,7 +280,7 @@ public class ActOnErrorTests
         string errorMessage = string.Empty;
         string s = "cba";
         Result<None> result = await TestService.DoNothing("abc")
-            .ActOnError(e => errorMessage = $"message logged: {e.Message}")
+            .Act<Error>(e => errorMessage = $"message logged: {e.Message}")
             .Then(_ => TestService.DoNothingAsync(s));
 
         errorMessage.Should().BeEmpty();
@@ -293,11 +293,11 @@ public class ActOnErrorTests
         string errorMessage = string.Empty;
         string s = "cba";
         Result<None> result = await TestService.DoNothing("    ")
-            .ActOnError(e => errorMessage = $"message logged: {e.Message}")
+            .Act<Error>(e => errorMessage = $"message logged: {e.Message}")
             .Then(_ => TestService.DoNothingAsync(s));
 
         errorMessage.Should().Be("message logged: Input value can't be empty");
-        result.Should().Be(new Error("Input value can't be empty"));
+        result.Should().Be(new Error(TestService.ErrorMessage));
     }
 
 
@@ -307,7 +307,7 @@ public class ActOnErrorTests
         string errorMessage = string.Empty;
         string s = "cba";
         Result<string> result = await TestService.DoNothingAsync("abc")
-            .ActOnError(e => errorMessage = $"message logged: {e.Message}")
+            .Act<None, Error>(e => errorMessage = $"message logged: {e.Message}")
             .Then(_ => TestService.ToUpperCase(s));
 
         errorMessage.Should().BeEmpty();
@@ -320,11 +320,11 @@ public class ActOnErrorTests
         string errorMessage = string.Empty;
         string s = "cba";
         Result<string> result = await TestService.DoNothingAsync("    ")
-            .ActOnError(e => errorMessage = $"message logged: {e.Message}")
+            .Act<None, Error>(e => errorMessage = $"message logged: {e.Message}")
             .Then(_ => TestService.ToUpperCase(s));
 
         errorMessage.Should().Be("message logged: Input value can't be empty");
-        result.Should().Be(new Error("Input value can't be empty"));
+        result.Should().Be(new Error(TestService.ErrorMessage));
     }
 
     [Fact]
@@ -333,7 +333,7 @@ public class ActOnErrorTests
         string errorMessage = string.Empty;
         string s = "cba";
         Result<string> result = await TestService.DoNothingAsync("abc")
-            .ActOnError(e => errorMessage = $"message logged: {e.Message}")
+            .Act<None, Error>(e => errorMessage = $"message logged: {e.Message}")
             .Then(_ => TestService.ToUpperCaseAsync(s));
 
         errorMessage.Should().BeEmpty();
@@ -346,11 +346,11 @@ public class ActOnErrorTests
         string errorMessage = string.Empty;
         string s = "cba";
         Result<string> result = await TestService.DoNothingAsync("    ")
-            .ActOnError(e => errorMessage = $"message logged: {e.Message}")
+            .Act<None, Error>(e => errorMessage = $"message logged: {e.Message}")
             .Then(_ => TestService.ToUpperCaseAsync(s));
 
         errorMessage.Should().Be("message logged: Input value can't be empty");
-        result.Should().Be(new Error("Input value can't be empty"));
+        result.Should().Be(new Error(TestService.ErrorMessage));
     }
 
     [Fact]
@@ -359,7 +359,7 @@ public class ActOnErrorTests
         string errorMessage = string.Empty;
         string s = "cba";
         Result<None> result = await TestService.DoNothingAsync("abc")
-            .ActOnError(e => errorMessage = $"message logged: {e.Message}")
+            .Act<None, Error>(e => errorMessage = $"message logged: {e.Message}")
             .Then(_ => TestService.DoNothing(s));
 
         errorMessage.Should().BeEmpty();
@@ -372,11 +372,11 @@ public class ActOnErrorTests
         string errorMessage = string.Empty;
         string s = "cba";
         Result<None> result = await TestService.DoNothingAsync("    ")
-            .ActOnError(e => errorMessage = $"message logged: {e.Message}")
+            .Act<None, Error>(e => errorMessage = $"message logged: {e.Message}")
             .Then(_ => TestService.DoNothing(s));
 
         errorMessage.Should().Be("message logged: Input value can't be empty");
-        result.Should().Be(new Error("Input value can't be empty"));
+        result.Should().Be(new Error(TestService.ErrorMessage));
     }
 
     [Fact]
@@ -385,7 +385,7 @@ public class ActOnErrorTests
         string errorMessage = string.Empty;
         string s = "cba";
         Result<None> result = await TestService.DoNothingAsync("abc")
-            .ActOnError(e => errorMessage = $"message logged: {e.Message}")
+            .Act<None, Error>(e => errorMessage = $"message logged: {e.Message}")
             .Then(_ => TestService.DoNothingAsync(s));
 
         errorMessage.Should().BeEmpty();
@@ -398,10 +398,10 @@ public class ActOnErrorTests
         string errorMessage = string.Empty;
         string s = "cba";
         Result<None> result = await TestService.DoNothingAsync("    ")
-            .ActOnError(e => errorMessage = $"message logged: {e.Message}")
+            .Act<None, Error>(e => errorMessage = $"message logged: {e.Message}")
             .Then(_ => TestService.DoNothingAsync(s));
 
         errorMessage.Should().Be("message logged: Input value can't be empty");
-        result.Should().Be(new Error("Input value can't be empty"));
+        result.Should().Be(new Error(TestService.ErrorMessage));
     }
 }
