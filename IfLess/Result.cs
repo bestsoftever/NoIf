@@ -36,24 +36,16 @@ public sealed class Right<TRight> : Result<TRight>
     }
 
     public override Result<TOutput> Then<TOutput>(Func<TRight, Result<TOutput>> func)
-    {
-        return func(Value);
-    }
+        => func(Value);
 
     public override async Task<Result<TOutput>> Then<TOutput>(Func<TRight, Task<Result<TOutput>>> func)
-    {
-        return await func(Value);
-    }
+        => await func(Value);
 
     public override Result<TRight> Swap<TToSwap>(Func<TToSwap, Result<TRight>> func)
-    {
-        return Value is TToSwap valueToSwap ? func(valueToSwap) : Value;
-    }
+        => Value is TToSwap valueToSwap ? func(valueToSwap) : Value;
 
     public override async Task<Result<TRight>> Swap<TToSwap>(Func<TToSwap, Task<Result<TRight>>> func)
-    {
-        return Value is TToSwap valueToSwap ? await func(valueToSwap) : Value;
-    }
+        => Value is TToSwap valueToSwap ? await func(valueToSwap) : Value;
 
     public override Result<TRight> Act<TToAct>(Action<TToAct> action)
     {
@@ -65,20 +57,14 @@ public sealed class Right<TRight> : Result<TRight>
         return Value;
     }
 
-    public override bool Equals(object? obj)
+    public override bool Equals(object? obj) => obj switch
     {
-        return obj switch
-        {
-            TRight value => value.Equals(Value),
-            Right<TRight> right => right.Value!.Equals(Value),
-            _ => false,
-        };
-    }
+        TRight value => value.Equals(Value),
+        Right<TRight> right => right.Value!.Equals(Value),
+        _ => false,
+    };
 
-    public override int GetHashCode()
-    {
-        return RuntimeHelpers.GetHashCode(this);
-    }
+    public override int GetHashCode() => RuntimeHelpers.GetHashCode(this);
 }
 
 public sealed class None
@@ -103,34 +89,21 @@ internal interface IWrong
 /// Wrapper over Error, so you can have non-generic Error for generic Result<T>
 /// </summary>
 /// <typeparam name="TRight"></typeparam>
-internal sealed class Wrong<TRight> : Result<TRight>, IWrong
+internal sealed class Wrong<TRight>(Error error) : Result<TRight>, IWrong
 {
-    public Error Error { get; init; }
-
-    public Wrong(Error error)
-    {
-        Error = error;
-    }
+    public Error Error { get; init; } = error;
 
     public override Result<TOutput> Then<TOutput>(Func<TRight, Result<TOutput>> func)
-    {
-        return Error;
-    }
+        => Error;
 
     public override async Task<Result<TOutput>> Then<TOutput>(Func<TRight, Task<Result<TOutput>>> func)
-    {
-        return await Task.FromResult(Error);
-    }
+        => await Task.FromResult(Error);
 
     public override Result<TRight> Swap<TToSwap>(Func<TToSwap, Result<TRight>> func)
-    {
-        return Error is TToSwap errorToSwap ? func(errorToSwap) : Error;
-    }
+        => Error is TToSwap errorToSwap ? func(errorToSwap) : Error;
 
     public override async Task<Result<TRight>> Swap<TToSwap>(Func<TToSwap, Task<Result<TRight>>> func)
-    {
-        return Error is TToSwap errorToSwap ? await func(errorToSwap) : Error;
-    }
+        => Error is TToSwap errorToSwap ? await func(errorToSwap) : Error;
 
     public override Result<TRight> Act<TToAct>(Action<TToAct> action)
     {
@@ -142,20 +115,14 @@ internal sealed class Wrong<TRight> : Result<TRight>, IWrong
         return Error;
     }
 
-    public override bool Equals(object? obj)
+    public override bool Equals(object? obj) => obj switch
     {
-        return obj switch
-        {
-            Error error => Error.Equals(error),
-            Wrong<TRight> wrong => Error.Equals(wrong),
-            _ => false,
-        };
-    }
+        Error error => Error.Equals(error),
+        Wrong<TRight> wrong => Error.Equals(wrong),
+        _ => false,
+    };
 
-    public override int GetHashCode()
-    {
-        return Error.GetHashCode();
-    }
+    public override int GetHashCode() => Error.GetHashCode();
 }
 
 /// <summary>
@@ -173,68 +140,35 @@ public class Error
         InnerErrors = innerErrors;
     }
 
-    public override bool Equals(object? obj)
+    public override bool Equals(object? obj) => obj switch
     {
-        return obj switch
-        {
-            Error error => Equals(this, error),
-            IWrong wrong => Equals(this, wrong.Error),
-            _ => false,
-        };
-    }
+        Error error => Equals(this, error),
+        IWrong wrong => Equals(this, wrong.Error),
+        _ => false,
+    };
 
-    private bool Equals(Error first, Error second)
-    {
-        return first.Message == second.Message && first.InnerErrors.SequenceEqual(second.InnerErrors);
-    }
+    private bool Equals(Error first, Error second) => first.Message == second.Message && first.InnerErrors.SequenceEqual(second.InnerErrors);
 
-    public override int GetHashCode()
-    {
-        return RuntimeHelpers.GetHashCode(this);
-    }
+    public override int GetHashCode() => RuntimeHelpers.GetHashCode(this);
 }
 
 public static class ResultExtensions
 {
     public static async Task<Result<TOutput>> Then<TInput, TOutput>(
-        this Task<Result<TInput>> task, Func<TInput, Result<TOutput>> func)
-    {
-        return (await task).Then(func);
-    }
+        this Task<Result<TInput>> task, Func<TInput, Result<TOutput>> func) => (await task).Then(func);
 
     public static async Task<Result<TOutput>> Then<TInput, TOutput>(
-        this Task<Result<TInput>> task, Func<TInput, Task<Result<TOutput>>> func)
-    {
-        return await (await task).Then(func);
-    }
+        this Task<Result<TInput>> task, Func<TInput, Task<Result<TOutput>>> func) => await (await task).Then(func);
 
-    public static async Task<Result<TRight>> Act<TRight, TToAct>(this Task<Result<TRight>> task, Action<TToAct> action)
-    {
-        return (await task).Act(action);
-    }
+    public static async Task<Result<TRight>> Act<TRight, TToAct>(this Task<Result<TRight>> task, Action<TToAct> action) => (await task).Act(action);
 
-    public static async Task<Result<TRight>> Act<TRight, TToAct>(this Task<Result<TRight>> task, Action<Task<TToAct>> action)
-    {
-        return (await task).Act(action);
-    }
+    public static async Task<Result<TRight>> Act<TRight, TToAct>(this Task<Result<TRight>> task, Action<Task<TToAct>> action) => (await task).Act(action);
 
-    public static Result<TRight> ActOnError<TRight>(this Result<TRight> result, Action<Error> errorHandler)
-    {
-        return result.Act(errorHandler);
-    }
+    public static Result<TRight> ActOnError<TRight>(this Result<TRight> result, Action<Error> errorHandler) => result.Act(errorHandler);
 
-    public static Task<Result<TRight>> ActOnError<TRight>(this Task<Result<TRight>> task, Action<Error> errorHandler)
-    {
-        return task.Act(errorHandler);
-    }
+    public static Task<Result<TRight>> ActOnError<TRight>(this Task<Result<TRight>> task, Action<Error> errorHandler) => task.Act(errorHandler);
 
-    public static async Task<Result<TRight>> Swap<TRight, TToSwap>(this Task<Result<TRight>> task, Func<TToSwap, Result<TRight>> func)
-    {
-        return (await task).Swap(func);
-    }
+    public static async Task<Result<TRight>> Swap<TRight, TToSwap>(this Task<Result<TRight>> task, Func<TToSwap, Result<TRight>> func) => (await task).Swap(func);
 
-    public static async Task<Result<TRight>> Swap<TRight, TToSwap>(this Task<Result<TRight>> task, Func<TToSwap, Task<Result<TRight>>> func)
-    {
-        return await (await task).Swap(func);
-    }
+    public static async Task<Result<TRight>> Swap<TRight, TToSwap>(this Task<Result<TRight>> task, Func<TToSwap, Task<Result<TRight>>> func) => await (await task).Swap(func);
 }
