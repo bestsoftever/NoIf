@@ -23,7 +23,7 @@ public class ActOnErrorTests
             .Then(s => TestService.ToUpperCase(s));
 
         errorMessage.Should().Be("message logged: Input value can't be empty");
-        result.Should().Be(new Error("Input value can't be empty"));
+        result.Should().Be(new Error(TestService.ErrorMessage));
     }
 
     [Fact]
@@ -47,7 +47,7 @@ public class ActOnErrorTests
             .Then(s => TestService.ToUpperCaseAsync(s));
 
         errorMessage.Should().Be("message logged: Input value can't be empty");
-        result.Should().Be(new Error("Input value can't be empty"));
+        result.Should().Be(new Error(TestService.ErrorMessage));
     }
 
     [Fact]
@@ -71,7 +71,7 @@ public class ActOnErrorTests
             .Then(s => TestService.DoNothing(s));
 
         errorMessage.Should().Be("message logged: Input value can't be empty");
-        result.Should().Be(new Error("Input value can't be empty"));
+        result.Should().Be(new Error(TestService.ErrorMessage));
     }
 
     [Fact]
@@ -95,7 +95,7 @@ public class ActOnErrorTests
             .Then(s => TestService.DoNothingAsync(s));
 
         errorMessage.Should().Be("message logged: Input value can't be empty");
-        result.Should().Be(new Error("Input value can't be empty"));
+        result.Should().Be(new Error(TestService.ErrorMessage));
     }
 
 
@@ -120,7 +120,7 @@ public class ActOnErrorTests
             .Then(s => TestService.ToUpperCase(s));
 
         errorMessage.Should().Be("message logged: Input value can't be empty");
-        result.Should().Be(new Error("Input value can't be empty"));
+        result.Should().Be(new Error(TestService.ErrorMessage));
     }
 
     [Fact]
@@ -144,7 +144,7 @@ public class ActOnErrorTests
             .Then(s => TestService.ToUpperCaseAsync(s));
 
         errorMessage.Should().Be("message logged: Input value can't be empty");
-        result.Should().Be(new Error("Input value can't be empty"));
+        result.Should().Be(new Error(TestService.ErrorMessage));
     }
 
     [Fact]
@@ -168,7 +168,7 @@ public class ActOnErrorTests
             .Then(s => TestService.DoNothing(s));
 
         errorMessage.Should().Be("message logged: Input value can't be empty");
-        result.Should().Be(new Error("Input value can't be empty"));
+        result.Should().Be(new Error(TestService.ErrorMessage));
     }
 
     [Fact]
@@ -192,7 +192,7 @@ public class ActOnErrorTests
             .Then(s => TestService.DoNothingAsync(s));
 
         errorMessage.Should().Be("message logged: Input value can't be empty");
-        result.Should().Be(new Error("Input value can't be empty"));
+        result.Should().Be(new Error(TestService.ErrorMessage));
     }
 
 
@@ -219,7 +219,7 @@ public class ActOnErrorTests
             .Then(_ => TestService.ToUpperCase(s));
 
         errorMessage.Should().Be("message logged: Input value can't be empty");
-        result.Should().Be(new Error("Input value can't be empty"));
+        result.Should().Be(new Error(TestService.ErrorMessage));
     }
 
     [Fact]
@@ -245,7 +245,7 @@ public class ActOnErrorTests
             .Then(_ => TestService.ToUpperCaseAsync(s));
 
         errorMessage.Should().Be("message logged: Input value can't be empty");
-        result.Should().Be(new Error("Input value can't be empty"));
+        result.Should().Be(new Error(TestService.ErrorMessage));
     }
 
     [Fact]
@@ -271,7 +271,7 @@ public class ActOnErrorTests
             .Then(_ => TestService.DoNothing(s));
 
         errorMessage.Should().Be("message logged: Input value can't be empty");
-        result.Should().Be(new Error("Input value can't be empty"));
+        result.Should().Be(new Error(TestService.ErrorMessage));
     }
 
     [Fact]
@@ -297,7 +297,7 @@ public class ActOnErrorTests
             .Then(_ => TestService.DoNothingAsync(s));
 
         errorMessage.Should().Be("message logged: Input value can't be empty");
-        result.Should().Be(new Error("Input value can't be empty"));
+        result.Should().Be(new Error(TestService.ErrorMessage));
     }
 
 
@@ -324,7 +324,7 @@ public class ActOnErrorTests
             .Then(_ => TestService.ToUpperCase(s));
 
         errorMessage.Should().Be("message logged: Input value can't be empty");
-        result.Should().Be(new Error("Input value can't be empty"));
+        result.Should().Be(new Error(TestService.ErrorMessage));
     }
 
     [Fact]
@@ -350,7 +350,7 @@ public class ActOnErrorTests
             .Then(_ => TestService.ToUpperCaseAsync(s));
 
         errorMessage.Should().Be("message logged: Input value can't be empty");
-        result.Should().Be(new Error("Input value can't be empty"));
+        result.Should().Be(new Error(TestService.ErrorMessage));
     }
 
     [Fact]
@@ -376,7 +376,7 @@ public class ActOnErrorTests
             .Then(_ => TestService.DoNothing(s));
 
         errorMessage.Should().Be("message logged: Input value can't be empty");
-        result.Should().Be(new Error("Input value can't be empty"));
+        result.Should().Be(new Error(TestService.ErrorMessage));
     }
 
     [Fact]
@@ -402,6 +402,6 @@ public class ActOnErrorTests
             .Then(_ => TestService.DoNothingAsync(s));
 
         errorMessage.Should().Be("message logged: Input value can't be empty");
-        result.Should().Be(new Error("Input value can't be empty"));
+        result.Should().Be(new Error(TestService.ErrorMessage));
     }
 }

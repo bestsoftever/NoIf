@@ -19,6 +19,6 @@ public class SwapTests
             .Swap<string>(e => new Error("weird"))
             .Then(s => TestService.ToUpperCase(s));
 
-        result.Should().Be(new Error("Input value can't be empty"));
+        result.Should().Be(new Error(TestService.ErrorMessage));
     }
 }

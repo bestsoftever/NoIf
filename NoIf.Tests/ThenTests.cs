@@ -7,19 +7,19 @@ public class ThenTests
     public static IEnumerable<object[]> ReturnsUpperCase()
     {
         yield return new object[] { "abc", "ABC" };
-        yield return new object[] { "", new Error("Input value can't be empty") };
+        yield return new object[] { "", new Error(TestService.ErrorMessage) };
     }
 
     public static IEnumerable<object[]> ReturnsUpperCaseAndReverse()
     {
         yield return new object[] { "abc", "CBA" };
-        yield return new object[] { "", new Error("Input value can't be empty") };
+        yield return new object[] { "", new Error(TestService.ErrorMessage) };
     }
 
     public static IEnumerable<object[]> ReturnsNone()
     {
         yield return new object[] { "abc", Result.None };
-        yield return new object[] { "", new Error("Input value can't be empty") };
+        yield return new object[] { "", new Error(TestService.ErrorMessage) };
     }
 
     [Theory, MemberData(nameof(ReturnsUpperCaseAndReverse))]
