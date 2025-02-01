@@ -1,4 +1,196 @@
+using Xunit.Sdk;
+
 namespace IfLess.Tests;
+
+// TODO: probably can be removed
+public class HandleErrorsTests
+{
+    class Error1 : Error
+    {
+        public Error1() : base("Error 1")
+        {
+        }
+    }
+
+    class Error2 : Error
+    {
+        public Error2() : base("Error 2")
+        {
+        }
+    }
+
+    public static Result<string> DoStuff(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input))
+        {
+            return new Error("Input value can't be empty");
+        }
+
+        return new string(input.Reverse().ToArray());
+    }
+
+    [Fact]
+    public void WhenErrorIsNotAnError_ReturnsSomethingElse()
+    {
+        static Result<string> ReturnError() => new Error1();
+
+        string errorMessage = string.Empty;
+        Result<string> result = ReturnError()
+            .Swap<Error1>(e => "replace error1")
+            .Swap<Error2>(e => "replace error2")
+            .Then(s => TestService.ToUpperCase(s));
+
+        result.Should().Be("REPLACE ERROR1");
+    }
+}
+
+// TODO: probably remove error test cases, leave only swaping a valid data
+public class SwapTests
+{
+    class NotAnError : Error
+    {
+        public NotAnError() : base("Not really an error")
+        {
+        }
+    }
+
+    // class Error2 : Error
+    // {
+    //     public Error2() : base("Error 2")
+    //     {
+    //     }
+    // }
+
+    public static Result<string> DoStuff(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input))
+        {
+            return new Error("Input value can't be empty");
+        }
+
+        return new string(input.Reverse().ToArray());
+    }
+
+    [Fact]
+    public void WhenErrorIsNotAnError_ReturnsValidValue()
+    {
+        static Result<string> ReturnError() => new NotAnError();
+
+        Result<string> result = ReturnError()
+            .Swap<NotAnError>(e => "something else")
+            .Then(s => TestService.ToUpperCase(s));
+
+        result.Should().Be("SOMETHING ELSE");
+    }
+
+    [Fact]
+    public void WhenErrorIsNotAnError_ReturnsValidValue2()
+    {
+        static Result<string> ReturnError() => "abc";
+
+        Result<string> result = ReturnError()
+            .Swap<NotAnError>(e => "something else")
+            .Then(s => TestService.ToUpperCase(s));
+
+        result.Should().Be("ABC");
+    }
+
+    [Fact]
+    public void WhenValidValueIsAnError_ReturnsError()
+    {
+        static Result<string> ReturnValue() => "abc";
+
+        Result<string> result = ReturnValue()
+            .Swap<string>(e => new Error("weird"))
+            .Then(s => TestService.ToUpperCase(s));
+
+        result.Should().Be(new Error("weird"));
+    }
+
+    [Fact]
+    public void WhenValidValueIsAnError_ReturnsError2()
+    {
+        static Result<string> ReturnValue() => new Error("abc");
+
+        Result<string> result = ReturnValue()
+            .Swap<string>(e => new Error("weird"))
+            .Then(s => TestService.ToUpperCase(s));
+
+        result.Should().Be(new Error("abc"));
+    }
+
+
+    //[Fact]
+    //public void WhenValidValueIsInFactError_ReturnsError()
+    //{
+    //    static Result<string> ReturnValue() => "VALUE";
+
+    //    Result<string> result = ReturnValue()
+    //        .Swap<NotAnError>(e => "something else")
+    //        .Then(s => TestService.ToUpperCase(s));
+
+    //    result.Should().Be("SOMETHING ELSE");
+    //}
+}
+
+
+public class IntegrationTests
+{
+    // The stupidest class hierarchy possible
+    public abstract class Animal(string name) { public string Name { get; init; } = name; }
+    public sealed class Dog(string name) : Animal(name) { }
+    public sealed class Cat(string name) : Animal(name) { }
+    public sealed class ThisParrotIsDeadError : Error
+    {
+        public ThisParrotIsDeadError() : base(":(")
+        {
+        }
+    }
+
+    public static TheoryData<Result<Animal>, string, string, bool> Data => new()
+    {
+        { new Dog("piesek"), "CAT IS PIESEK", string.Empty, true },
+        { new ThisParrotIsDeadError(), "CAT IS KOTEK", ":(", false }
+    };
+
+    [Theory, MemberData(nameof(Data))]
+    public void Full_Flow_Works(Result<Animal> oracleResult, string expectedResult, string expectedError, bool expectedPies)
+    {
+        Result<Animal> GetRandomPetFromOracle() => oracleResult;
+        string errorMessage = string.Empty;
+        bool isPies = false;
+
+        var result = GetRandomPetFromOracle()
+            .Act<Error>(e => errorMessage = e.Message)
+            .Act<Dog>(d => isPies = true)
+            .Swap<ThisParrotIsDeadError>(e => new Cat("kotek"))
+            .Swap<Dog>(d => new Cat(d.Name))
+            .Then(c => TestService.ToUpperCase($"{c.GetType().Name} is {c.Name}"));
+
+        result.Should().Be(expectedResult);
+        errorMessage.Should().Be(expectedError);
+        isPies.Should().Be(expectedPies);
+    }
+}
+
+public class NestedThenTests
+{
+    [Fact]
+    public void NestedFlow_Works()
+    {
+        static Result<int> GetRandomNumber() => 4;
+        static Result<int> GetBiggerRandomNumber() => 5;
+
+        var result = GetRandomNumber()
+            .Then(x =>
+            {
+                return GetBiggerRandomNumber()
+                    .Then<int>(y => x * y);
+            });
+
+        result.Should().Be(20);
+    }
+}
 
 public class ThenTests
 {
@@ -13,7 +205,7 @@ public class ThenTests
         yield return new object[] { "abc", "CBA" };
         yield return new object[] { "", new Error("Input value can't be empty") };
     }
-    
+
     public static IEnumerable<object[]> ReturnsNone()
     {
         yield return new object[] { "abc", Result.None };
@@ -165,7 +357,7 @@ public class ThenTests
     }
 }
 
-public class NoneTests
+public class NoneEqualityTests
 {
     [Fact]
     public void NoneIsNone()
@@ -174,7 +366,7 @@ public class NoneTests
     }
 }
 
-public class ErrorTests
+public class ErrorEqualityTests
 {
     [Fact]
     public void SimpleErrorWorks()
@@ -185,17 +377,6 @@ public class ErrorTests
         result.Should().Be(new Error("wrong!"));
 
         static Result<string> DoStuff() => new Error("wrong!");
-    }
-
-    [Fact]
-    public void ErrorWorks()
-    {
-        var error = DoStuff();
-        var result = error.Then<bool>(x => x.StartsWith("a"));
-
-        result.Should().Be(new Error("Some error"));
-
-        static Result<string> DoStuff() => new Error("Some error");
     }
 
     [Fact]

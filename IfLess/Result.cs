@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 
 namespace IfLess;
 
@@ -8,6 +7,12 @@ public abstract class Result<TRight>
     public abstract Result<TOutput> Then<TOutput>(Func<TRight, Result<TOutput>> func);
 
     public abstract Task<Result<TOutput>> Then<TOutput>(Func<TRight, Task<Result<TOutput>>> func);
+
+    public abstract Result<TRight> Swap<TToSwap>(Func<TToSwap, Result<TRight>> func);
+
+    public abstract Task<Result<TRight>> Swap<TToSwap>(Func<TToSwap, Task<Result<TRight>>> func);
+
+    public abstract Result<TRight> Act<TToAct>(Action<TToAct> action);
 
     public static implicit operator Result<TRight>(Error error) => new Wrong<TRight>(error);
 
@@ -40,6 +45,26 @@ public sealed class Right<TRight> : Result<TRight>
         return await func(Value);
     }
 
+    public override Result<TRight> Swap<TToSwap>(Func<TToSwap, Result<TRight>> func)
+    {
+        return Value is TToSwap valueToSwap ? func(valueToSwap) : Value;
+    }
+
+    public override async Task<Result<TRight>> Swap<TToSwap>(Func<TToSwap, Task<Result<TRight>>> func)
+    {
+        return Value is TToSwap valueToSwap ? await func(valueToSwap) : Value;
+    }
+
+    public override Result<TRight> Act<TToAct>(Action<TToAct> action)
+    {
+        if (Value is TToAct valueToAct)
+        {
+            action(valueToAct);
+        }
+
+        return Value;
+    }
+
     public override bool Equals(object? obj)
     {
         return obj switch
@@ -58,9 +83,7 @@ public sealed class Right<TRight> : Result<TRight>
 
 public sealed class None
 {
-    internal None()
-    {
-    }
+    internal None() { }
 }
 
 public static class Result
@@ -97,6 +120,26 @@ internal sealed class Wrong<TRight> : Result<TRight>, IWrong
     public override async Task<Result<TOutput>> Then<TOutput>(Func<TRight, Task<Result<TOutput>>> func)
     {
         return await Task.FromResult(Error);
+    }
+
+    public override Result<TRight> Swap<TToSwap>(Func<TToSwap, Result<TRight>> func)
+    {
+        return Error is TToSwap errorToSwap ? func(errorToSwap) : Error;
+    }
+
+    public override async Task<Result<TRight>> Swap<TToSwap>(Func<TToSwap, Task<Result<TRight>>> func)
+    {
+        return Error is TToSwap errorToSwap ? await func(errorToSwap) : Error;
+    }
+
+    public override Result<TRight> Act<TToAct>(Action<TToAct> action)
+    {
+        if (Error is TToAct valueToAct)
+        {
+            action(valueToAct);
+        }
+
+        return Error;
     }
 
     public override bool Equals(object? obj)
@@ -165,38 +208,33 @@ public static class ResultExtensions
         return await (await task).Then(func);
     }
 
-    public static Result<TRight> ThenError<TRight>(
-        this Result<TRight> result, Action<Error> errorHandler)
+    public static async Task<Result<TRight>> Act<TRight, TToAct>(this Task<Result<TRight>> task, Action<TToAct> action)
     {
-        Error HandleError(Error error)
-        {
-            errorHandler(error);
-            return error;
-        }
-
-        return result switch
-        {
-            Right<TRight> right => right,
-            Wrong<TRight> wrong => HandleError(wrong.Error),
-            _ => throw new InvalidOperationException("It cannot happen!"),
-        };
+        return (await task).Act(action);
     }
 
-    public static async Task<Result<TRight>> ThenError<TRight>(
-        this Task<Result<TRight>> task, Action<Error> errorHandler)
+    public static async Task<Result<TRight>> Act<TRight, TToAct>(this Task<Result<TRight>> task, Action<Task<TToAct>> action)
     {
-        Error HandleError(Error error)
-        {
-            errorHandler(error);
-            return error;
-        }
+        return (await task).Act(action);
+    }
 
-        var result = await task;
-        return result switch
-        {
-            Right<TRight> right => right,
-            Wrong<TRight> wrong => HandleError(wrong.Error),
-            _ => throw new InvalidOperationException("It cannot happen!"),
-        };
+    public static Result<TRight> ActOnError<TRight>(this Result<TRight> result, Action<Error> errorHandler)
+    {
+        return result.Act(errorHandler);
+    }
+
+    public static Task<Result<TRight>> ActOnError<TRight>(this Task<Result<TRight>> task, Action<Error> errorHandler)
+    {
+        return task.Act(errorHandler);
+    }
+
+    public static async Task<Result<TRight>> Swap<TRight, TToSwap>(this Task<Result<TRight>> task, Func<TToSwap, Result<TRight>> func)
+    {
+        return (await task).Swap(func);
+    }
+
+    public static async Task<Result<TRight>> Swap<TRight, TToSwap>(this Task<Result<TRight>> task, Func<TToSwap, Task<Result<TRight>>> func)
+    {
+        return await (await task).Swap(func);
     }
 }
