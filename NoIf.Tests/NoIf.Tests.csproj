@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\IfLess\IfLess.csproj" />
+    <ProjectReference Include="..\NoIf\NoIf.csproj" />
   </ItemGroup>
 
 </Project>

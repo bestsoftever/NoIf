@@ -128,17 +128,10 @@ internal sealed class Wrong<TRight>(Error error) : Result<TRight>, IWrong
 /// <summary>
 /// Base class for errors
 /// </summary>
-public class Error
+public class Error(string message, params Error[] innerErrors)
 {
-    public string Message { get; }
-
-    public IEnumerable<Error> InnerErrors { get; }
-
-    public Error(string message, params Error[] innerErrors)
-    {
-        Message = message;
-        InnerErrors = innerErrors;
-    }
+    public string Message { get; init; } = message;
+    public IEnumerable<Error> InnerErrors { get; init; } = innerErrors;
 
     public override bool Equals(object? obj) => obj switch
     {
@@ -147,28 +140,34 @@ public class Error
         _ => false,
     };
 
-    private bool Equals(Error first, Error second) => first.Message == second.Message && first.InnerErrors.SequenceEqual(second.InnerErrors);
+    private static bool Equals(Error first, Error second) => first.Message == second.Message && first.InnerErrors.SequenceEqual(second.InnerErrors);
 
     public override int GetHashCode() => RuntimeHelpers.GetHashCode(this);
 }
 
-public static class ResultExtensions
+public static class AsyncResultExtensions
 {
-    public static async Task<Result<TOutput>> Then<TInput, TOutput>(
-        this Task<Result<TInput>> task, Func<TInput, Result<TOutput>> func) => (await task).Then(func);
+    public static async Task<Result<TOutput>> Then<TInput, TOutput>(this Task<Result<TInput>> task, Func<TInput, Result<TOutput>> func)
+        => (await task).Then(func);
 
-    public static async Task<Result<TOutput>> Then<TInput, TOutput>(
-        this Task<Result<TInput>> task, Func<TInput, Task<Result<TOutput>>> func) => await (await task).Then(func);
+    public static async Task<Result<TOutput>> Then<TInput, TOutput>(this Task<Result<TInput>> task, Func<TInput, Task<Result<TOutput>>> func)
+        => await (await task).Then(func);
 
-    public static async Task<Result<TRight>> Act<TRight, TToAct>(this Task<Result<TRight>> task, Action<TToAct> action) => (await task).Act(action);
+    public static async Task<Result<TRight>> Act<TRight, TToAct>(this Task<Result<TRight>> task, Action<TToAct> action)
+        => (await task).Act(action);
 
-    public static async Task<Result<TRight>> Act<TRight, TToAct>(this Task<Result<TRight>> task, Action<Task<TToAct>> action) => (await task).Act(action);
+    public static async Task<Result<TRight>> Act<TRight, TToAct>(this Task<Result<TRight>> task, Action<Task<TToAct>> action)
+        => (await task).Act(action);
 
-    public static Result<TRight> ActOnError<TRight>(this Result<TRight> result, Action<Error> errorHandler) => result.Act(errorHandler);
+    public static Result<TRight> ActOnError<TRight>(this Result<TRight> result, Action<Error> errorHandler)
+        => result.Act(errorHandler);
 
-    public static Task<Result<TRight>> ActOnError<TRight>(this Task<Result<TRight>> task, Action<Error> errorHandler) => task.Act(errorHandler);
+    public static Task<Result<TRight>> ActOnError<TRight>(this Task<Result<TRight>> task, Action<Error> errorHandler)
+        => task.Act(errorHandler);
 
-    public static async Task<Result<TRight>> Swap<TRight, TToSwap>(this Task<Result<TRight>> task, Func<TToSwap, Result<TRight>> func) => (await task).Swap(func);
+    public static async Task<Result<TRight>> Swap<TRight, TToSwap>(this Task<Result<TRight>> task, Func<TToSwap, Result<TRight>> func)
+        => (await task).Swap(func);
 
-    public static async Task<Result<TRight>> Swap<TRight, TToSwap>(this Task<Result<TRight>> task, Func<TToSwap, Task<Result<TRight>>> func) => await (await task).Swap(func);
+    public static async Task<Result<TRight>> Swap<TRight, TToSwap>(this Task<Result<TRight>> task, Func<TToSwap, Task<Result<TRight>>> func)
+        => await (await task).Swap(func);
 }
