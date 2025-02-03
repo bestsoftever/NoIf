@@ -54,19 +54,19 @@ public class ActOnErrorTests
 	public void SyncToNone_Valid()
 	{
 		string errorMessage = string.Empty;
-		Result<None> result = TestService.ReverseString("abc")
+		Result<Unit> result = TestService.ReverseString("abc")
 			.ActOnError(e => errorMessage = $"message logged: {e.Message}")
 			.Then(s => TestService.DoNothing(s));
 
 		errorMessage.Should().BeEmpty();
-		result.Should().Be(Result.None);
+		result.Should().Be(Unit.Default);
 	}
 
 	[Fact]
 	public void SyncToNone_Error()
 	{
 		string errorMessage = string.Empty;
-		Result<None> result = TestService.ReverseString("    ")
+		Result<Unit> result = TestService.ReverseString("    ")
 			.ActOnError(e => errorMessage = $"message logged: {e.Message}")
 			.Then(s => TestService.DoNothing(s));
 
@@ -78,19 +78,19 @@ public class ActOnErrorTests
 	public async Task SyncToNoneAsync_Valid()
 	{
 		string errorMessage = string.Empty;
-		Result<None> result = await TestService.ReverseString("abc")
+		Result<Unit> result = await TestService.ReverseString("abc")
 			.ActOnError(e => errorMessage = $"message logged: {e.Message}")
 			.Then(s => TestService.DoNothingAsync(s));
 
 		errorMessage.Should().BeEmpty();
-		result.Should().Be(Result.None);
+		result.Should().Be(Unit.Default);
 	}
 
 	[Fact]
 	public async Task SyncToNoneAsync_Error()
 	{
 		string errorMessage = string.Empty;
-		Result<None> result = await TestService.ReverseString("    ")
+		Result<Unit> result = await TestService.ReverseString("    ")
 			.ActOnError(e => errorMessage = $"message logged: {e.Message}")
 			.Then(s => TestService.DoNothingAsync(s));
 
@@ -151,19 +151,19 @@ public class ActOnErrorTests
 	public async Task AsyncToNone_Valid()
 	{
 		string errorMessage = string.Empty;
-		Result<None> result = await TestService.ReverseStringAsync("abc")
+		Result<Unit> result = await TestService.ReverseStringAsync("abc")
 			.ActOnError(e => errorMessage = $"message logged: {e.Message}")
 			.Then(s => TestService.DoNothing(s));
 
 		errorMessage.Should().BeEmpty();
-		result.Should().Be(Result.None);
+		result.Should().Be(Unit.Default);
 	}
 
 	[Fact]
 	public async Task AsyncToNone_Error()
 	{
 		string errorMessage = string.Empty;
-		Result<None> result = await TestService.ReverseStringAsync("    ")
+		Result<Unit> result = await TestService.ReverseStringAsync("    ")
 			.ActOnError(e => errorMessage = $"message logged: {e.Message}")
 			.Then(s => TestService.DoNothing(s));
 
@@ -175,19 +175,19 @@ public class ActOnErrorTests
 	public async Task AsyncToNoneAsync_Valid()
 	{
 		string errorMessage = string.Empty;
-		Result<None> result = await TestService.ReverseStringAsync("abc")
+		Result<Unit> result = await TestService.ReverseStringAsync("abc")
 			.ActOnError(e => errorMessage = $"message logged: {e.Message}")
 			.Then(s => TestService.DoNothingAsync(s));
 
 		errorMessage.Should().BeEmpty();
-		result.Should().Be(Result.None);
+		result.Should().Be(Unit.Default);
 	}
 
 	[Fact]
 	public async Task AsyncToNoneAsync_Error()
 	{
 		string errorMessage = string.Empty;
-		Result<None> result = await TestService.ReverseStringAsync("    ")
+		Result<Unit> result = await TestService.ReverseStringAsync("    ")
 			.ActOnError(e => errorMessage = $"message logged: {e.Message}")
 			.Then(s => TestService.DoNothingAsync(s));
 
@@ -253,12 +253,12 @@ public class ActOnErrorTests
 	{
 		string errorMessage = string.Empty;
 		string s = "cba";
-		Result<None> result = TestService.DoNothing("abc")
+		Result<Unit> result = TestService.DoNothing("abc")
 			.ActOnError(e => errorMessage = $"message logged: {e.Message}")
 			.Then(_ => TestService.DoNothing(s));
 
 		errorMessage.Should().BeEmpty();
-		result.Should().Be(Result.None);
+		result.Should().Be(Unit.Default);
 	}
 
 	[Fact]
@@ -266,7 +266,7 @@ public class ActOnErrorTests
 	{
 		string errorMessage = string.Empty;
 		string s = "cba";
-		Result<None> result = TestService.DoNothing("    ")
+		Result<Unit> result = TestService.DoNothing("    ")
 			.ActOnError(e => errorMessage = $"message logged: {e.Message}")
 			.Then(_ => TestService.DoNothing(s));
 
@@ -279,12 +279,12 @@ public class ActOnErrorTests
 	{
 		string errorMessage = string.Empty;
 		string s = "cba";
-		Result<None> result = await TestService.DoNothing("abc")
+		Result<Unit> result = await TestService.DoNothing("abc")
 			.ActOnError(e => errorMessage = $"message logged: {e.Message}")
 			.Then(_ => TestService.DoNothingAsync(s));
 
 		errorMessage.Should().BeEmpty();
-		result.Should().Be(Result.None);
+		result.Should().Be(Unit.Default);
 	}
 
 	[Fact]
@@ -292,7 +292,7 @@ public class ActOnErrorTests
 	{
 		string errorMessage = string.Empty;
 		string s = "cba";
-		Result<None> result = await TestService.DoNothing("    ")
+		Result<Unit> result = await TestService.DoNothing("    ")
 			.ActOnError(e => errorMessage = $"message logged: {e.Message}")
 			.Then(_ => TestService.DoNothingAsync(s));
 
@@ -358,12 +358,12 @@ public class ActOnErrorTests
 	{
 		string errorMessage = string.Empty;
 		string s = "cba";
-		Result<None> result = await TestService.DoNothingAsync("abc")
+		Result<Unit> result = await TestService.DoNothingAsync("abc")
 			.ActOnError(e => errorMessage = $"message logged: {e.Message}")
 			.Then(_ => TestService.DoNothing(s));
 
 		errorMessage.Should().BeEmpty();
-		result.Should().Be(Result.None);
+		result.Should().Be(Unit.Default);
 	}
 
 	[Fact]
@@ -371,7 +371,7 @@ public class ActOnErrorTests
 	{
 		string errorMessage = string.Empty;
 		string s = "cba";
-		Result<None> result = await TestService.DoNothingAsync("    ")
+		Result<Unit> result = await TestService.DoNothingAsync("    ")
 			.ActOnError(e => errorMessage = $"message logged: {e.Message}")
 			.Then(_ => TestService.DoNothing(s));
 
@@ -384,12 +384,12 @@ public class ActOnErrorTests
 	{
 		string errorMessage = string.Empty;
 		string s = "cba";
-		Result<None> result = await TestService.DoNothingAsync("abc")
+		Result<Unit> result = await TestService.DoNothingAsync("abc")
 			.ActOnError(e => errorMessage = $"message logged: {e.Message}")
 			.Then(_ => TestService.DoNothingAsync(s));
 
 		errorMessage.Should().BeEmpty();
-		result.Should().Be(Result.None);
+		result.Should().Be(Unit.Default);
 	}
 
 	[Fact]
@@ -397,7 +397,7 @@ public class ActOnErrorTests
 	{
 		string errorMessage = string.Empty;
 		string s = "cba";
-		Result<None> result = await TestService.DoNothingAsync("    ")
+		Result<Unit> result = await TestService.DoNothingAsync("    ")
 			.ActOnError(e => errorMessage = $"message logged: {e.Message}")
 			.Then(_ => TestService.DoNothingAsync(s));
 

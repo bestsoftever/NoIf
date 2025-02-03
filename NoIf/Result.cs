@@ -27,7 +27,7 @@ internal sealed class Right<TRight> : Result<TRight>
 	{
 		if (value == null)
 		{
-			throw new Exception("A literal that represents a non-existing reference is not a proper value of anything. If you'd like to represent the lack of a value, please use Result.None.");
+			throw new Exception("A literal that represents a non-existing reference is not a proper value of anything. If you'd like to represent the lack of a value, please use Unit.Default.");
 		}
 
 		Value = value;

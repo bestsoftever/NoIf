@@ -48,17 +48,17 @@ static class TestService
 		return input.ToUpperInvariant();
 	}
 
-	public static Result<None> DoNothing(string input)
+	public static Result<Unit> DoNothing(string input)
 	{
 		if (string.IsNullOrWhiteSpace(input))
 		{
 			return new Error(ErrorMessage);
 		}
 
-		return Result.None;
+		return Unit.Default;
 	}
 
-	public static async Task<Result<None>> DoNothingAsync(string input)
+	public static async Task<Result<Unit>> DoNothingAsync(string input)
 	{
 		await Task.Yield();
 
@@ -67,6 +67,6 @@ static class TestService
 			return new Error(ErrorMessage);
 		}
 
-		return Result.None;
+		return Unit.Default;
 	}
 }
