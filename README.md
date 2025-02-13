@@ -1,43 +1,28 @@
 # NoIf
 
 Write simpler to understand code.
-It means - to avoid throwing exceptions in case of business errors and to avoid using `if` or `catch` statements to check 
-if positive path can be continued.
+It means - to avoid throwing exceptions in case of errors and to avoid using `if` or `catch` statements to check 
+if a happy path can be continued.
 
-# Requirements
+# Features
 
-## Functional
+1. Type which represents a result of an operation - `Result<T>`. It can contain data of type `T` or an `Error`.
+1. Set of `Then` methods which allows to invoke next operation on `Result<T>` (also with overrides which support async code)
+1. `Unit.Default` - to represent the lack of a value returned from a method.
+1. `Error` - as base cless for errors returned from methods. It support nesting/aggregate errors.
+1. Set of `Act<T>` methods - which allows to invoke an action if the result of the previous operation is `T`.
+1. Set of `Swap<T>` methods - which allows to swap the result type if the result of the previous operation is `T`.
 
-1. Type which represents a result of an operation. Let's call it `Result<T>`.
-1. Set of `Then` methods which allows to invoke next operation on `Result<T>` (with support to async code)
-1. Support also fuctions which don't return values. Classic `void` won't work. And no, `null` is not an option here.
-1. Errors can be nested/composite.
-1. Methods which allows to filter out errrors and convert them to valid results and vice versa. (Very often an error returned from one method is handled in another one and doesn't have to be returned as an error to the upper layer.)
+## What is not implemented
 
-## Non-functional
-
-1. It must be easy to use and easy to migrate from the existing codebase.
-1. No time-wasting methods like:
-    a. `return AbstractResultFactoryBeanImpl.CreateResultOf<OrderId>(...)` 
-    b. `return Result.Of<OrderId>(...)` 
-    c. `return new Result<OrderId>(...)`
-    d. ... or any other similar things
-2. No `result.IsError` - the goal of this library is to prevent people from using `if` statements. Such property is counterproductive.
-2. No `result.IsValid` - it's even worse than `IsError`, because errors needs special handling, not valid results!
-2. No `result.IsSuccess` - it's even worse than `IsValid`, programming has nothing to do with success.
-2. No parameterless constructors available for users to prevent people from creting unintialized results.
-2. Errors must go through the whole flow without re-mapping.
-
-# The solution
-
-```csharp
-var result = GetRandomPetFromOracle()
-	.Act<Error>(e => errorMessage = e.Message)
-	.Act<Dog>(d => isPies = true)
-	.Swap<ThisParrotIsDeadError>(e => new Cat("kotek"))
-	.Swap<Dog>(d => new Cat(d.Name))
-	.Then(c => TestService.ToUpperCase($"{c.GetType().Name} is {c.Name}"));
-```
+1. Methods like:
+    a. `return AbstractResultFactoryBeanImpl.CreateResultOf<string>(...)` 
+    b. `return Result.Of<string>(...)` 
+    c. `return new Result<string>(...)`
+1. No `result.IsError` - the goal of this library is to prevent people from using `if` statements. Such property makes no sense.
+1. No `result.IsValid` - it's even worse than `IsError`, because errors needs special handling, not valid results!
+1. No `result.IsSuccess` - it's even worse than `IsValid`, programming has nothing to do with success.
+1. No parameterless constructors available for users to prevent people from creating unintialized results.
 
 # Migration
 
@@ -57,7 +42,7 @@ public static string ReverseString(string input)
 }
 ```
 
-With `NoIf` we  need to replace throwing exceptions with returning Error:
+With `NoIf` we only need to replace throwing exceptions with returning Error:
 
 ```csharp
 public static Result<string> ReverseString(string input)
