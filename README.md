@@ -1,104 +1,122 @@
-# The goal
+# NoIf
 
-To write code which doesn't look that bad as usual.
-
-## What is the problem?
-
-Typical code is full of instructions responsible for error and exception handling, 
-so the actuall flow is hidden and very often invisible. 
-
-Example:
-
-```csharp
-
-try
-{
-    var user = _usersRepository.GetById(request.UserId);
-
-    if (user is null)
-    {
-        var userData = Mapper.Map<User>(request.NewUser);
-        user = _usersRepository.Add(userData);
-    }
-}
-catch(DatabaseException dex)
-{
-    throw new InvalidUserException("Error creating user", dex);
-}
-
-try
-{
-}
-
-```
-
-I know, we can split this in smaller methods, but almost nobody does that, and it won't help much with 
-visibility of the flow in the code.
-
-## How it could look like?
-
-```csharp
-public Result<OrderId> PlaceOrder(OrderRequest orderRequest)
-{
-    return _customersRepository.GetById(orderRequest.UserId)
-        .Then(customer => _customerDiscountsService.Calculate(customer))
-        .Then(discount => _itemsMapper.MapItems(request.Items)
-            .Then(items => _warehouseService.EnsureAvailability(items))
-            .Then(items => _invoiceGenerator.Calculate(items, discount))
-            .Then(invoice => _paymentProcessor.Send(invoice))
-            .Then(paymentData => _warehouseSerbice.Send(user.Address))
-        );
-}
-```
-
-For me this code is much cleaner.
+Write simpler to understand code.
+It means - to avoid throwing exceptions in case of business errors and to avoid using `if` or `catch` statements to check 
+if positive path can be continued.
 
 # Requirements
 
 ## Functional
 
-1. We need a type which represents a result of an operation. Let's call it `Result<T>`.
-1. We need a set of `Then` methods which allows to invoke next operation on `Result<T>` (with support to async code)
-1. We need to be able to plug-in into the flow also fuctions which don't have return values. Classic `void` won't work. And no, `null` is not an option here.
+1. Type which represents a result of an operation. Let's call it `Result<T>`.
+1. Set of `Then` methods which allows to invoke next operation on `Result<T>` (with support to async code)
+1. Support also fuctions which don't return values. Classic `void` won't work. And no, `null` is not an option here.
 1. Errors can be nested/composite.
-1. We need methods which allows 
+1. Methods which allows to filter out errrors and convert them to valid results and vice versa. (Very often an error returned from one method is handled in another one and doesn't have to be returned as an error to the upper layer.)
 
 ## Non-functional
 
-1. It must be easy to use and easy to migrate from the existing codebase. (So even lazy people like me can use it.)
+1. It must be easy to use and easy to migrate from the existing codebase.
 1. No time-wasting methods like:
-    a. `return ResultFactory.CreateResultOf<OrderId>(...)` 
+    a. `return AbstractResultFactoryBeanImpl.CreateResultOf<OrderId>(...)` 
     b. `return Result.Of<OrderId>(...)` 
     c. `return new Result<OrderId>(...)`
-    d. (and any other similar things)
+    d. ... or any other similar things
 2. No `result.IsError` - the goal of this library is to prevent people from using `if` statements. Such property is counterproductive.
 2. No `result.IsValid` - it's even worse than `IsError`, because errors needs special handling, not valid results!
 2. No `result.IsSuccess` - it's even worse than `IsValid`, programming has nothing to do with success.
-2. No paramterless constructors available for users to prevent people from creting unintialized results.
+2. No parameterless constructors available for users to prevent people from creting unintialized results.
 2. Errors must go through the whole flow without re-mapping.
 
 # The solution
 
-Some people just write a simple class like that:
+```csharp
+var result = GetRandomPetFromOracle()
+	.Act<Error>(e => errorMessage = e.Message)
+	.Act<Dog>(d => isPies = true)
+	.Swap<ThisParrotIsDeadError>(e => new Cat("kotek"))
+	.Swap<Dog>(d => new Cat(d.Name))
+	.Then(c => TestService.ToUpperCase($"{c.GetType().Name} is {c.Name}"));
+```
+
+# Migration
+
+## Introducing Result\<T>
+
+Let's take a method:
 
 ```csharp
-public class ServiceResult<TData> : Either<ServiceResultError, TData>
+public static string ReverseString(string input)
 {
-    public ServiceResult(ServiceResultError error) : base(error)
-    {
-    }
+	if (string.IsNullOrWhiteSpace(input))
+	{
+		throw new ArgumentException(nameof(input));
+	}
 
-    public ServiceResult(TData data) : base(data)
-    {
-    }
-
-    public bool IsError => isLeft;
-    public ServiceResultError Error => left;
-    public TData Data => right;
+	return new string(input.Reverse().ToArray());
 }
 ```
 
-And it violates the . 
+With `NoIf` we  need to replace throwing exceptions with returning Error:
 
-Is here.
+```csharp
+public static Result<string> ReverseString(string input)
+{
+	if (string.IsNullOrWhiteSpace(input))
+	{
+		return new Error(ErrorMessage);
+	}
 
+	return new string(input.Reverse().ToArray());
+}
+```
+
+## Flow simplification
+
+We can convert this:
+
+```csharp
+public string ProcessAnimal(Guid id)
+{
+    Animal animal = null!;
+
+    try
+    {
+	    animal = GetPetFromOracle(id);
+    }
+    catch (ThisParrotIsDeadException pe)
+    {
+	    errorMessage = pe.Message;
+	    animal = new Cat("kotek");
+    }
+    catch (Exception e)
+    {
+	    errorMessage = e.Message;
+    }
+
+    if (animal is Dog d)
+    {
+	    isPies = true;
+	    animal = new Cat(d.Name);
+    }
+
+    var result = TestService.ToUpperCase($"{animal.GetType().Name} is {animal.Name}");
+	return result;
+}
+```
+
+to this:
+
+```csharp
+public Result<string> ProcessAnimal(Guid id)
+{
+	return GetPetFromOracle(id)
+		.Act<Error>(e => errorMessage = e.Message)
+		.Act<Dog>(d => isPies = true)
+		.Swap<ThisParrotIsDeadError>(e => new Cat("kotek"))
+		.Swap<Dog>(d => new Cat(d.Name))
+		.Then(c => TestService.ToUpperCase($"{c.GetType().Name} is {c.Name}"));
+}
+```
+
+Of course, the `GetPetFromOracle` method must return `Result<Animal>` and use errors instead of exceptions, but this is an easy migration as shown before.
