@@ -1,15 +1,16 @@
 # NoIf
 
-Write simpler to understand code.
+Write easier to understand code, faster.
+
 It means - to avoid throwing exceptions in case of errors and to avoid using `if` or `catch` statements to check 
 if a happy path can be continued.
 
 # Features
 
-1. Type which represents a result of an operation - `Result<T>`. It can contain data of type `T` or an `Error`.
+1. Type which represents a result of an operation - `Result<T>`. The variable of that type can store either data of type `T` or an `Error`.
+1. `Error` - as base cless for errors returned from methods. It support nesting/aggregate errors.
 1. Set of `Then` methods which allows to invoke next operation on `Result<T>` (also with overrides which support async code)
 1. `Unit.Default` - to represent the lack of a value returned from a method.
-1. `Error` - as base cless for errors returned from methods. It support nesting/aggregate errors.
 1. Set of `Act<T>` methods - which allows to invoke an action if the result of the previous operation is `T`.
 1. Set of `Swap<T>` methods - which allows to swap the result type if the result of the previous operation is `T`.
 
@@ -19,10 +20,10 @@ if a happy path can be continued.
     a. `return AbstractResultFactoryBeanImpl.CreateResultOf<string>(...)` 
     b. `return Result.Of<string>(...)` 
     c. `return new Result<string>(...)`
-1. No `result.IsError` - the goal of this library is to prevent people from using `if` statements. Such property makes no sense.
+1. No `result.IsError` - the goal of this library is to prevent people from using `if` statements, thus such property would make no sense.
 1. No `result.IsValid` - it's even worse than `IsError`, because errors needs special handling, not valid results!
 1. No `result.IsSuccess` - it's even worse than `IsValid`, programming has nothing to do with success.
-1. No parameterless constructors available for users to prevent people from creating unintialized results.
+1. No parameterless constructors available for users to prevent from creating unintialized results.
 
 # Migration
 
@@ -55,6 +56,8 @@ public static Result<string> ReverseString(string input)
 	return new string(input.Reverse().ToArray());
 }
 ```
+
+No need to change valid cases, wraping it in `Result<T>`.
 
 ## Flow simplification
 
