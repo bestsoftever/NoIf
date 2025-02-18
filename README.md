@@ -1,8 +1,7 @@
 # NoIf
 
-Write easier to understand code, faster.
-
-It means - to avoid throwing exceptions in case of errors and to avoid using `if` or `catch` statements to check 
+Write easier to understand code.
+Or at least try to avoid throwing exceptions in case of errors and using `if` or `catch` statements to check 
 if a happy path can be continued.
 
 # Features
@@ -21,8 +20,7 @@ if a happy path can be continued.
     b. `return Result.Of<string>(...)` 
     c. `return new Result<string>(...)`
 1. No `result.IsError` - the goal of this library is to prevent people from using `if` statements, thus such property would make no sense.
-1. No `result.IsValid` - it's even worse than `IsError`, because errors needs special handling, not valid results!
-1. No `result.IsSuccess` - it's even worse than `IsValid`, programming has nothing to do with success.
+1. No `result.IsValid` or `result.IsSuccess` - it's even worse than `IsError`, because errors needs special handling, not valid results!
 1. No parameterless constructors available for users to prevent from creating unintialized results.
 
 # Migration
