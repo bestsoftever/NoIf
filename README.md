@@ -10,7 +10,7 @@ if a happy path can be continued.
 1. Type which represents a result of an operation - `Result<T>`. The variable of that type can store either data of type `T` or an `Error`.
 1. `Error` - as base cless for errors returned from methods. It support nesting/aggregate errors.
 1. Set of `Then` methods which allows to invoke next operation on `Result<T>` (also with overrides which support async code)
-1. `Unit.Default` - to represent the lack of a value returned from a method.
+1. `Result.None` - to represent the lack of a value returned from a method.
 1. Set of `Act<T>` methods - which allows to invoke an action if the result of the previous operation is `T`.
 1. Set of `Swap<T>` methods - which allows to swap the result type if the result of the previous operation is `T`.
 

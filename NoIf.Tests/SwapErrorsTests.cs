@@ -45,41 +45,41 @@ public class SwapErrorsTests
 	[Fact]
 	public void SyncToNone_Valid()
 	{
-		Result<Unit> result = TestService.ReverseString("abc")
+		Result<None> result = TestService.ReverseString("abc")
 			.Swap<Error>(e => e.Message)
 			.Then(s => TestService.DoNothing(s));
 
-		result.Should().Be(Unit.Default);
+		result.Should().Be(Result.None);
 	}
 
 	[Fact]
 	public void SyncToNone_Error()
 	{
-		Result<Unit> result = TestService.ReverseString("    ")
+		Result<None> result = TestService.ReverseString("    ")
 			.Swap<Error>(e => e.Message)
 			.Then(s => TestService.DoNothing(s));
 
-		result.Should().Be(Unit.Default);
+		result.Should().Be(Result.None);
 	}
 
 	[Fact]
 	public async Task SyncToNoneAsync_Valid()
 	{
-		Result<Unit> result = await TestService.ReverseString("abc")
+		Result<None> result = await TestService.ReverseString("abc")
 			.Swap<Error>(e => e.Message)
 			.Then(s => TestService.DoNothingAsync(s));
 
-		result.Should().Be(Unit.Default);
+		result.Should().Be(Result.None);
 	}
 
 	[Fact]
 	public async Task SyncToNoneAsync_Error()
 	{
-		Result<Unit> result = await TestService.ReverseString("    ")
+		Result<None> result = await TestService.ReverseString("    ")
 			.Swap<Error>(e => e.Message)
 			.Then(s => TestService.DoNothingAsync(s));
 
-		result.Should().Be(Unit.Default);
+		result.Should().Be(Result.None);
 	}
 
 
@@ -126,41 +126,41 @@ public class SwapErrorsTests
 	[Fact]
 	public async Task AsyncToNone_Valid()
 	{
-		Result<Unit> result = await TestService.ReverseStringAsync("abc")
+		Result<None> result = await TestService.ReverseStringAsync("abc")
 			.Swap<string, Error>(e => e.Message)
 			.Then(s => TestService.DoNothing(s));
 
-		result.Should().Be(Unit.Default);
+		result.Should().Be(Result.None);
 	}
 
 	[Fact]
 	public async Task AsyncToNone_Error()
 	{
-		Result<Unit> result = await TestService.ReverseStringAsync("    ")
+		Result<None> result = await TestService.ReverseStringAsync("    ")
 			.Swap<string, Error>(e => e.Message)
 			.Then(s => TestService.DoNothing(s));
 
-		result.Should().Be(Unit.Default);
+		result.Should().Be(Result.None);
 	}
 
 	[Fact]
 	public async Task AsyncToNoneAsync_Valid()
 	{
-		Result<Unit> result = await TestService.ReverseStringAsync("abc")
+		Result<None> result = await TestService.ReverseStringAsync("abc")
 			.Swap<string, Error>(e => e.Message)
 			.Then(s => TestService.DoNothingAsync(s));
 
-		result.Should().Be(Unit.Default);
+		result.Should().Be(Result.None);
 	}
 
 	[Fact]
 	public async Task AsyncToNoneAsync_Error()
 	{
-		Result<Unit> result = await TestService.ReverseStringAsync("    ")
+		Result<None> result = await TestService.ReverseStringAsync("    ")
 			.Swap<string, Error>(e => e.Message)
 			.Then(s => TestService.DoNothingAsync(s));
 
-		result.Should().Be(Unit.Default);
+		result.Should().Be(Result.None);
 	}
 
 
@@ -169,7 +169,7 @@ public class SwapErrorsTests
 	{
 		string s = "cba";
 		Result<string> result = TestService.DoNothing("abc")
-			.Swap<Error>(e => Unit.Default)
+			.Swap<Error>(e => Result.None)
 			.Then(_ => TestService.ToUpperCase(s));
 
 		result.Should().Be("CBA");
@@ -180,7 +180,7 @@ public class SwapErrorsTests
 	{
 		string s = "cba";
 		Result<string> result = TestService.DoNothing("    ")
-			.Swap<Error>(e => Unit.Default)
+			.Swap<Error>(e => Result.None)
 			.Then(_ => TestService.ToUpperCase(s));
 
 		result.Should().Be("CBA");
@@ -191,7 +191,7 @@ public class SwapErrorsTests
 	{
 		string s = "cba";
 		Result<string> result = await TestService.DoNothing("abc")
-			.Swap<Error>(e => Unit.Default)
+			.Swap<Error>(e => Result.None)
 			.Then(_ => TestService.ToUpperCaseAsync(s));
 
 		result.Should().Be("CBA");
@@ -202,7 +202,7 @@ public class SwapErrorsTests
 	{
 		string s = "cba";
 		Result<string> result = await TestService.DoNothing("    ")
-			.Swap<Error>(e => Unit.Default)
+			.Swap<Error>(e => Result.None)
 			.Then(_ => TestService.ToUpperCaseAsync(s));
 
 		result.Should().Be("CBA");
@@ -212,43 +212,43 @@ public class SwapErrorsTests
 	public void NoneToNone_Valid()
 	{
 		string s = "cba";
-		Result<Unit> result = TestService.DoNothing("abc")
-			.Swap<Error>(e => Unit.Default)
+		Result<None> result = TestService.DoNothing("abc")
+			.Swap<Error>(e => Result.None)
 			.Then(_ => TestService.DoNothing(s));
 
-		result.Should().Be(Unit.Default);
+		result.Should().Be(Result.None);
 	}
 
 	[Fact]
 	public void NoneToNone_Error()
 	{
 		string s = "cba";
-		Result<Unit> result = TestService.DoNothing("    ")
-			.Swap<Error>(e => Unit.Default)
+		Result<None> result = TestService.DoNothing("    ")
+			.Swap<Error>(e => Result.None)
 			.Then(_ => TestService.DoNothing(s));
 
-		result.Should().Be(Unit.Default);
+		result.Should().Be(Result.None);
 	}
 
 	[Fact]
 	public async Task NoneToNoneAsync_Valid()
 	{
 		string s = "cba";
-		Result<Unit> result = await TestService.DoNothing("abc")
-			.Swap<Error>(e => Unit.Default)
+		Result<None> result = await TestService.DoNothing("abc")
+			.Swap<Error>(e => Result.None)
 			.Then(_ => TestService.DoNothingAsync(s));
 
-		result.Should().Be(Unit.Default);
+		result.Should().Be(Result.None);
 	}
 
 	[Fact]
 	public async Task NoneToNoneAsync_Error()
 	{
-		Result<Unit> result = await TestService.DoNothing("    ")
-			.Swap<Error>(e => Unit.Default)
+		Result<None> result = await TestService.DoNothing("    ")
+			.Swap<Error>(e => Result.None)
 			.Then(_ => TestService.DoNothingAsync("cba"));
 
-		result.Should().Be(Unit.Default);
+		result.Should().Be(Result.None);
 	}
 
 
@@ -257,7 +257,7 @@ public class SwapErrorsTests
 	{
 		string s = "cba";
 		Result<string> result = await TestService.DoNothingAsync("abc")
-			.Swap<Unit, Error>(e => Unit.Default)
+			.Swap<None, Error>(e => Result.None)
 			.Then(_ => TestService.ToUpperCase(s));
 
 		result.Should().Be("CBA");
@@ -268,7 +268,7 @@ public class SwapErrorsTests
 	{
 		string s = "cba";
 		Result<string> result = await TestService.DoNothingAsync("    ")
-			.Swap<Unit, Error>(e => Unit.Default)
+			.Swap<None, Error>(e => Result.None)
 			.Then(_ => TestService.ToUpperCase(s));
 
 		result.Should().Be("CBA");
@@ -279,7 +279,7 @@ public class SwapErrorsTests
 	{
 		string s = "cba";
 		Result<string> result = await TestService.DoNothingAsync("abc")
-			.Swap<Unit, Error>(e => Unit.Default)
+			.Swap<None, Error>(e => Result.None)
 			.Then(_ => TestService.ToUpperCaseAsync(s));
 
 		result.Should().Be("CBA");
@@ -290,7 +290,7 @@ public class SwapErrorsTests
 	{
 		string s = "cba";
 		Result<string> result = await TestService.DoNothingAsync("    ")
-			.Swap<Unit, Error>(e => Unit.Default)
+			.Swap<None, Error>(e => Result.None)
 			.Then(_ => TestService.ToUpperCaseAsync(s));
 
 		result.Should().Be("CBA");
@@ -300,44 +300,44 @@ public class SwapErrorsTests
 	public async Task NoneAsyncToNone_Valid()
 	{
 		string s = "cba";
-		Result<Unit> result = await TestService.DoNothingAsync("abc")
-			.Swap<Unit, Error>(e => Unit.Default)
+		Result<None> result = await TestService.DoNothingAsync("abc")
+			.Swap<None, Error>(e => Result.None)
 			.Then(_ => TestService.DoNothing(s));
 
-		result.Should().Be(Unit.Default);
+		result.Should().Be(Result.None);
 	}
 
 	[Fact]
 	public async Task NoneAsyncToNone_Error()
 	{
 		string s = "cba";
-		Result<Unit> result = await TestService.DoNothingAsync("    ")
-			.Swap<Unit, Error>(e => Unit.Default)
+		Result<None> result = await TestService.DoNothingAsync("    ")
+			.Swap<None, Error>(e => Result.None)
 			.Then(_ => TestService.DoNothing(s));
 
-		result.Should().Be(Unit.Default);
+		result.Should().Be(Result.None);
 	}
 
 	[Fact]
 	public async Task NoneAsyncToNoneAsync_Valid()
 	{
 		string s = "cba";
-		Result<Unit> result = await TestService.DoNothingAsync("abc")
-			.Swap<Unit, Error>(e => Unit.Default)
+		Result<None> result = await TestService.DoNothingAsync("abc")
+			.Swap<None, Error>(e => Result.None)
 			.Then(_ => TestService.DoNothingAsync(s));
 
 
-		result.Should().Be(Unit.Default);
+		result.Should().Be(Result.None);
 	}
 
 	[Fact]
 	public async Task NoneAsyncToNoneAsync_Error()
 	{
 		string s = "cba";
-		Result<Unit> result = await TestService.DoNothingAsync("    ")
-			.Swap<Unit, Error>(e => Unit.Default)
+		Result<None> result = await TestService.DoNothingAsync("    ")
+			.Swap<None, Error>(e => Result.None)
 			.Then(_ => TestService.DoNothingAsync(s));
 
-		result.Should().Be(Unit.Default);
+		result.Should().Be(Result.None);
 	}
 }

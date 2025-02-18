@@ -16,7 +16,7 @@ public class ThenTests
 
 	public static IEnumerable<object[]> ReturnsNone()
 	{
-		yield return new object[] { "abc", Unit.Default };
+		yield return new object[] { "abc", Result.None };
 		yield return new object[] { "", new Error(TestService.ErrorMessage) };
 	}
 
@@ -39,18 +39,18 @@ public class ThenTests
 	}
 
 	[Theory, MemberData(nameof(ReturnsNone))]
-	public void SyncToNone(string input, Result<Unit> expected)
+	public void SyncToNone(string input, Result<None> expected)
 	{
-		Result<Unit> result = TestService.ReverseString(input)
+		Result<None> result = TestService.ReverseString(input)
 			.Then(s => TestService.DoNothing(s));
 
 		result.Should().Be(expected);
 	}
 
 	[Theory, MemberData(nameof(ReturnsNone))]
-	public async Task SyncToNoneAsync(string input, Result<Unit> expected)
+	public async Task SyncToNoneAsync(string input, Result<None> expected)
 	{
-		Result<Unit> result = await TestService.ReverseString(input)
+		Result<None> result = await TestService.ReverseString(input)
 			.Then(s => TestService.DoNothingAsync(s));
 
 		result.Should().Be(expected);
@@ -75,18 +75,18 @@ public class ThenTests
 	}
 
 	[Theory, MemberData(nameof(ReturnsNone))]
-	public async Task AsyncToNone(string input, Result<Unit> expected)
+	public async Task AsyncToNone(string input, Result<None> expected)
 	{
-		Result<Unit> result = await TestService.ReverseStringAsync(input)
+		Result<None> result = await TestService.ReverseStringAsync(input)
 			.Then(s => TestService.DoNothing(s));
 
 		result.Should().Be(expected);
 	}
 
 	[Theory, MemberData(nameof(ReturnsNone))]
-	public async Task AsyncToNoneAsync(string input, Result<Unit> expected)
+	public async Task AsyncToNoneAsync(string input, Result<None> expected)
 	{
-		Result<Unit> result = await TestService.ReverseStringAsync(input)
+		Result<None> result = await TestService.ReverseStringAsync(input)
 			.Then(s => TestService.DoNothingAsync(s));
 
 		result.Should().Be(expected);
@@ -111,18 +111,18 @@ public class ThenTests
 	}
 
 	[Theory, MemberData(nameof(ReturnsNone))]
-	public void NoneToNone(string input, Result<Unit> expected)
+	public void NoneToNone(string input, Result<None> expected)
 	{
-		Result<Unit> result = TestService.DoNothing(input)
+		Result<None> result = TestService.DoNothing(input)
 			.Then(_ => TestService.DoNothing(input));
 
 		result.Should().Be(expected);
 	}
 
 	[Theory, MemberData(nameof(ReturnsNone))]
-	public async Task NoneToNoneAsync(string input, Result<Unit> expected)
+	public async Task NoneToNoneAsync(string input, Result<None> expected)
 	{
-		Result<Unit> result = await TestService.DoNothing(input)
+		Result<None> result = await TestService.DoNothing(input)
 			.Then(_ => TestService.DoNothingAsync(input));
 
 		result.Should().Be(expected);
@@ -147,18 +147,18 @@ public class ThenTests
 	}
 
 	[Theory, MemberData(nameof(ReturnsNone))]
-	public async void NoneAsyncToNone(string input, Result<Unit> expected)
+	public async void NoneAsyncToNone(string input, Result<None> expected)
 	{
-		Result<Unit> result = await TestService.DoNothingAsync(input)
+		Result<None> result = await TestService.DoNothingAsync(input)
 			.Then(_ => TestService.DoNothing(input));
 
 		result.Should().Be(expected);
 	}
 
 	[Theory, MemberData(nameof(ReturnsNone))]
-	public async Task NoneAsyncToNoneAsync(string input, Result<Unit> expected)
+	public async Task NoneAsyncToNoneAsync(string input, Result<None> expected)
 	{
-		Result<Unit> result = await TestService.DoNothingAsync(input)
+		Result<None> result = await TestService.DoNothingAsync(input)
 			.Then(_ => TestService.DoNothingAsync(input));
 
 		result.Should().Be(expected);

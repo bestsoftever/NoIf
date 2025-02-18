@@ -1,5 +1,15 @@
 ﻿namespace NoIf;
 
+public sealed class None
+{
+	internal None() { }
+}
+
+public sealed class Result
+{
+	public static None None { get; } = new();
+}
+
 public abstract class Result<TRight>
 {
 	public abstract Result<TOutput> Then<TOutput>(Func<TRight, Result<TOutput>> func);
@@ -27,7 +37,7 @@ internal sealed class Right<TRight> : Result<TRight>
 	{
 		if (value == null)
 		{
-			throw new Exception("A literal that represents a non-existing reference is not a proper value of anything. If you'd like to represent the lack of a value, please use Unit.Default.");
+			throw new Exception("A literal that represents a non-existing reference is not a proper value of anything. If you'd like to represent the lack of a value, please use Result.None.");
 		}
 
 		Value = value;

@@ -5,7 +5,7 @@ public class EqualityTests
 	[Fact]
 	public void NoneIsNone()
 	{
-		Unit.Default.Should().Be(Unit.Default);
+		Result.None.Should().Be(Result.None);
 	}
 
 	[Fact]
