@@ -1,8 +1,8 @@
 # NoIf
 
-Write easier to understand code.
-Or at least try to avoid throwing exceptions in case of errors and using `if` or `catch` statements to check 
-if a happy path can be continued.
+Write easier to understand code!
+- Stop using exceptions to represent errors - return `Result<T>` from all methods.
+- Implement flow as a chain of methods and focus on happy path, instead of exception handling.
 
 # Features
 
